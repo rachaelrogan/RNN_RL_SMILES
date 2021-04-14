@@ -27,7 +27,8 @@ class Vocabulary(object):
         """Takes a list of characters (eg '[NH]') and encodes to array of indices"""
         smiles_matrix = np.zeros(len(char_list), dtype=np.float32)
         for i, char in enumerate(char_list):
-            smiles_matrix[i] = self.vocab[char]
+            if char in self.vocab:
+                smiles_matrix[i] = self.vocab[char]
 
         return smiles_matrix
 

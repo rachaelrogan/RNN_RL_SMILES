@@ -16,7 +16,7 @@ def pretrain(restore_from=None):
     "Train the Prior RNN"
 
     # Reads vocabulary from a file
-    voc = Vocabulary(init_from_file="data/Voc")
+    voc = Vocabulary(init_from_file="data/Voc_danish")
 
     # Create a Dataset from a SMILES file
     # moldata = MolData("data/ChEMBL_filtered", voc)

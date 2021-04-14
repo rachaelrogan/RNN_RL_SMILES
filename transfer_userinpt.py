@@ -83,7 +83,6 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
             if step % 80 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
@@ -100,8 +99,10 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
                 tqdm.write("*"*50 + '\n')
                 torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
+        print("here9")
         valid = 0
         #valid_smis = []
+        print("HERE")
         for i, seq in enumerate(seqs.cpu().numpy()):
             smile = voc.decode(seq)
             if Chem.MolFromSmiles(smile):
@@ -188,9 +189,9 @@ if __name__ == "__main__":
     parser.add_argument('--voc', action='store', dest='voc_dir',
                         default='data/Voc_danish', help='Directory for the vocabulary')
                         # default='data/Voc_withda', help='Directory for the vocabulary')
-    parser.add_argument('--smi', action='store', dest='smi_dir', default='cano_acceptors_smi.csv',
+    parser.add_argument('--smi', action='store', dest='smi_dir', default='./deepsmile_test/refined_smii.csv',
                         help='Directory of the SMILES file for tranfer learning')
-    parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_gua_withda.ckpt',
+    parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_local.ckpt', #Prior_gua_withda.ckpt
                         help='Directory of the prior trained RNN')
     parser.add_argument('--tf_model',action='store', dest='tf_dir', default='data/tf_model_acceptor_smi_tuneall2.ckpt',
                         help='Directory of the transfer model')
