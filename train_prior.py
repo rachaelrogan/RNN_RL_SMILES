@@ -16,14 +16,15 @@ def pretrain(restore_from=None):
     "Train the Prior RNN"
 
     # Reads vocabulary from a file
-    voc = Vocabulary(init_from_file="data/Voc")
+    # voc = Vocabulary(init_from_file="data/Voc")
+    voc = Vocabulary(init_from_file="mols.smi")
 
     # Create a Dataset from a SMILES file
     # moldata = MolData("data/ChEMBL_filtered", voc)
     moldata = MolData("data/danish.smi", voc)
     data = DataLoader(moldata, batch_size=128, shuffle=True, drop_last=True,
                      collate_fn=MolData.collate_fn)
-
+    print("in pretrain(), voc: ", voc)
     Prior = RNN(voc)
 
     # Can restore from a  saved RNN

@@ -51,13 +51,15 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
 
     """
     voc = Vocabulary(init_from_file=voc_dir)
-    #cano_smi_file('all_smi_refined.csv', 'all_smi_refined_cano.csv')
+    #cano_smi_file('all_smi_refined.csv', 'all_smi_refined_cano.csv') # writes to a file
+    cano_smi_file('data/refined_smi_test.csv', 'all_smi_refined_cano.csv')
     moldata = MolData(smi_dir, voc)
     # Monomers 67 and 180 were removed because of the unseen [C-] in voc
     # DAs containing [C] removed: 43 molecules in 5356; Ge removed: 154 in 5356; [c] removed 4 in 5356
     # [S] 1 molecule in 5356
     data = DataLoader(moldata, batch_size=64, shuffle=True, drop_last=False,
                       collate_fn=MolData.collate_fn)
+    print("inside train_model voc.vocab_size: ", voc.vocab_size)
     transfer_model = RNN(voc)
     # if freeze=True, freeze all parameters except those in the linear layer
     if freeze:
@@ -188,11 +190,15 @@ if __name__ == "__main__":
     parser.add_argument('--voc', action='store', dest='voc_dir',
                         default='data/Voc_danish', help='Directory for the vocabulary')
                         # default='data/Voc_withda', help='Directory for the vocabulary')
-    parser.add_argument('--smi', action='store', dest='smi_dir', default='cano_acceptors_smi.csv',
+    # parser.add_argument('--smi', action='store', dest='smi_dir', default='cano_acceptors_smi.csv',
+    # parser.add_argument('--smi', action='store', dest='smi_dir', default='deepsmile_test/monomer_db.csv',
+    parser.add_argument('--smi', action='store', dest='smi_dir', default='mols.smi',
                         help='Directory of the SMILES file for tranfer learning')
-    parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_gua_withda.ckpt',
+    # parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_gua_withda.ckpt',
+    parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_local.ckpt',
                         help='Directory of the prior trained RNN')
-    parser.add_argument('--tf_model',action='store', dest='tf_dir', default='data/tf_model_acceptor_smi_tuneall2.ckpt',
+    # parser.add_argument('--tf_model',action='store', dest='tf_dir', default='data/tf_model_acceptor_smi_tuneall2.ckpt',
+    parser.add_argument('--tf_model',action='store', dest='tf_dir', default='data/Prior_local.ckpt',
                         help='Directory of the transfer model')
     parser.add_argument('--nums', action='store', dest='nums', default='1024',
                         help='Number of SMILES to sample for transfer learning')
@@ -203,6 +209,7 @@ if __name__ == "__main__":
     arg_dict = vars(parser.parse_args())
     print(arg_dict)
     task_, voc_, smi_, prior_, tf_, nums_, save_smi_, tf_process_dir_ = arg_dict.values()
+    print("voc_: ", voc_)
 
     if task_ == 'train_model':
         train_model(voc_dir=voc_, smi_dir=smi_, prior_dir=prior_, tf_dir=tf_,

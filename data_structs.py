@@ -99,6 +99,7 @@ class MolData(Dataset):
     def __getitem__(self, i):
         mol = self.smiles[i]
         tokenized = self.voc.tokenize(mol)
+        print("tokenized", tokenized)
         encoded = self.voc.encode(tokenized)
         if encoded is not None:
             return Variable(encoded)

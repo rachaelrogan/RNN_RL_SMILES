@@ -1,0 +1,15 @@
+210 - CALL transfer_userinpt.train_model
+    - problem with  tf_process_dir=tf_process_dir_,freeze=False)
+72 - in train_model definition
+    - problem with map_location=lambda storage, loc: storage))
+
+
+- in train_model definition, we create transfer_model, which is an RNN as defined
+in model.py.
+- in model.py, the RNN is self.rnn = MultiGRU, which is also defined in model.py
+- MultiGRU is defined with PyTorch with voc_size as the input dimension
+
+Takeaway: voc_size is really important
+
+- make sure that we are reading from all the proper files
+- make sure that there are no unnecessary newlines in the mols.smi

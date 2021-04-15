@@ -14,7 +14,7 @@ class MultiGRU(nn.Module):
     def __init__(self, voc_size):
         super(MultiGRU, self).__init__()
         #self.voc_size = voc_size
-        #print(voc_size)
+        print("voc_size: ", voc_size)
         self.embedding = nn.Embedding(voc_size, 128)
         self.gru_1 = nn.GRUCell(128, 512)
         #self.gru_1 = nn.GRU(128,512)
