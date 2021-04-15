@@ -9,7 +9,7 @@ Python 3.6
 
 PyTorch 0.1.12
 
-RDkit
+RDkit (my-rdkit-env)
 
 Scikit-Learn (for QSAR scoring function)
 

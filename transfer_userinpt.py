@@ -85,7 +85,6 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
             if step % 80 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
@@ -102,8 +101,10 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
                 tqdm.write("*"*50 + '\n')
                 torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
+        print("here9")
         valid = 0
         #valid_smis = []
+        print("HERE")
         for i, seq in enumerate(seqs.cpu().numpy()):
             smile = voc.decode(seq)
             if Chem.MolFromSmiles(smile):
