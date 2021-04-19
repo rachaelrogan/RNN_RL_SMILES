@@ -32,7 +32,7 @@ class Vocabulary(object):
 
         return smiles_matrix
 
-    def decode(self, matrix):
+    def decode(self, matrix): ### change to SELFIES
         """Takes an array of indices and returns the corresponding SMILES"""
         chars = []
         for i in matrix:
@@ -42,7 +42,7 @@ class Vocabulary(object):
         smiles = smiles.replace("L", "Cl").replace("R", "Br")
         return smiles
 
-    def tokenize(self, smiles):
+    def tokenize(self, smiles): ### change to SELFIES
         """Takes a SMILES and return a list of characters/tokens"""
         regex = '(\[[^\[\]]{1,6}\])'
         smiles = replace_halogen(smiles)
@@ -80,7 +80,7 @@ class Vocabulary(object):
     def __str__(self):
         return "Vocabulary containing {} tokens: {}".format(len(self), self.chars)
 
-class MolData(Dataset):
+class MolData(Dataset): ### change to SELFIES
     """Custom PyTorch Dataset that takes a file containing SMILES.
 
         Args:
@@ -130,7 +130,7 @@ def replace_halogen(string):
 
     return string
 
-def tokenize(smiles):
+def tokenize(smiles): ### change to SELFIES
     """Takes a SMILES string and returns a list of tokens.
     This will swap 'Cl' and 'Br' to 'L' and 'R' and treat
     '[xx]' as one token."""
@@ -147,7 +147,7 @@ def tokenize(smiles):
     tokenized.append('EOS')
     return tokenized
 
-def canonicalize_smiles_from_file(fname):
+def canonicalize_smiles_from_file(fname): ### change to SELFIES
     """Reads a SMILES file and returns a list of RDKIT SMILES"""
     with open(fname, 'r') as f:
         smiles_list = []
@@ -174,13 +174,13 @@ def filter_mol(mol, max_heavy_atoms=50, min_heavy_atoms=10, element_list=[6,7,8,
         else:
             return False
 
-def write_smiles_to_file(smiles_list, fname):
+def write_smiles_to_file(smiles_list, fname): ### convert from SELFIES to SMILES first
     """Write a list of SMILES to a file."""
     with open(fname, 'w') as f:
         for smiles in smiles_list:
             f.write(smiles + "\n")
 
-def filter_on_chars(smiles_list, chars):
+def filter_on_chars(smiles_list, chars): ### change to SELFIES = ?
     """Filters SMILES on the characters they contain.
        Used to remove SMILES containing very rare/undesirable
        characters."""
@@ -191,7 +191,7 @@ def filter_on_chars(smiles_list, chars):
             smiles_list_valid.append(smiles)
     return smiles_list_valid
 
-def filter_file_on_chars(smiles_fname, voc_fname):
+def filter_file_on_chars(smiles_fname, voc_fname): ### change to SELFIES
     """Filters a SMILES file using a vocabulary file.
        Only SMILES containing nothing but the characters
        in the vocabulary will be retained."""
@@ -221,7 +221,7 @@ def combine_voc_from_files(fnames):
         for char in chars:
             f.write(char + "\n")
 
-def construct_vocabulary(smiles_list):
+def construct_vocabulary(smiles_list): ### change to SELFIES
     """Returns all the characters present in a SMILES file.
        Uses regex to find characters/tokens of the format '[x]'."""
     add_chars = set()
