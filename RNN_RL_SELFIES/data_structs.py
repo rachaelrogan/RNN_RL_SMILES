@@ -164,10 +164,23 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
     #     #print("smiles_list: ", smiles_list)
     #     return smiles_list
     """Reads a SMILES file and returns a list of SELFIES strings"""
+    # encoder returning None: https://selfies-mirror.readthedocs.io/en/latest/selfies.html
+    # Either the molecules we are dealing with are not able to be changed to SELFIES at all, 
+    # or we must change the semantic constraints of selfies? (This didn't work based on how
+    # I implemented it.)
     with open(fname, 'r') as f:
         selfies_list = []
+        # default_constraints = selfies.get_semantic_constraints()
+        # new_constraints = default_constraints
+        # new_constraints['O'] = 4
+        # new_constraints['C'] = 8
+        # selfies.set_semantic_constraints(new_constraints)  # update constraints
+        # print("constraints: ", selfies.get_semantic_constraints())
         for i, line in enumerate(f):
-            selfies_list.append(selfies.encoder(line))
+            #print("line:", line)
+            encoded = selfies.encoder(line, print_error=True)
+            # print("encoded: ", encoded)
+            selfies_list.append(encoded)
         print("{} SMILES retrieved".format(len(selfies_list)))
         return selfies_list
 
@@ -306,6 +319,7 @@ if __name__ == "__main__":
     smiles_file = sys.argv[1]
     print("Reading smiles...")
     selfies_list = canonicalize_smiles_from_file(smiles_file)
-    print("Constructing vocabulary...")
-    voc_chars = construct_vocabulary(selfies_list, 'data/Voc_danish')
+    print("selfies_list", selfies_list)
+    # print("Constructing vocabulary...")
+    # voc_chars = construct_vocabulary(selfies_list, 'data/Voc_danish')
     # write_smiles_to_file(selfies_list, "data/danish.smi")
