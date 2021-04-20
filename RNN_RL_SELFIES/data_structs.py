@@ -179,7 +179,7 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
         for i, line in enumerate(f):
             #print("line:", line)
             encoded = selfies.encoder(line, print_error=True)
-            # print("encoded: ", encoded)
+            #  print("encoded: ", encoded)
             selfies_list.append(encoded)
         print("{} SMILES retrieved".format(len(selfies_list)))
         return selfies_list
