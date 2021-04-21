@@ -8,6 +8,9 @@ def main(file):
         selfies_list = []
         for i, line in enumerate(f):
             selfies_list.append(convert(line))
+    for i in selfies_list:
+        if(i == None):
+            selfies_list.remove(i)
     with open("SMILES_" + file, 'w+') as f:
         for i in selfies_list:
             f.write(str(i) + "\n")
