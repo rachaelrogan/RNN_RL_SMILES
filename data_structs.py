@@ -157,9 +157,11 @@ def canonicalize_selfies_from_file(fname): ### change to SELFIES
             if i % 10 == 0:
                 print("{} lines processed.".format(i))
             selfie = line.split(" ")[0]
-            mol = Chem.MolFromSmiles(selfies.decoder(selfie)) ### Need to find replacement for RDkit package, for now we convert back to selfies
-            if filter_mol(mol):
-                smiles_list.append(Chem.MolToSmiles(mol))
+            smile = selfies.decoder(selfie)
+            if smile != None:
+                mol = Chem.MolFromSmiles(selfies.decoder(selfie)) ### Need to find replacement for RDkit package, for now we convert back to selfies
+                if filter_mol(mol):
+                    smiles_list.append(Chem.MolToSmiles(mol))
         print("{} SELFIES retrieved".format(len(smiles_list)))
         #print("smiles_list: ", smiles_list)
         return smiles_list
@@ -291,7 +293,7 @@ def mask_seq(seqs, seq_lens):
 if __name__ == "__main__":
     selfies_file = sys.argv[1]
     print("Reading smiles...")
-    smiles_list = canonicalize_selfies_from_file(smiles_file)
+    smiles_list = canonicalize_selfies_from_file(selfies_file)
     print("Constructing vocabulary...")
     voc_chars = construct_vocabulary(smiles_list)
     write_smiles_to_file(smiles_list, "data/danish.smi")

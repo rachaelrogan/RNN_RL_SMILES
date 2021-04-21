@@ -26,6 +26,7 @@ Then use ./train_prior.py to train the Prior. A pretrained Prior is included.
 To do transfer learning on a target dataset, use transfer_userinpt.py.
 
 # NOTE: This is a cloned repository to which we are making modifications for a class. We do not own the original code.
+The orignal code can be found here: https://github.com/qyuan7/RNN_RL_molecule
 
 Notes:
  - Limit database size for github: limiter.py Training_Database.smiles
