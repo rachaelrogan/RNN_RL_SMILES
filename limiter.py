@@ -4,7 +4,7 @@ def main(file):
     with open(file, 'r') as f:
         selfies_list = []
         for i, line in enumerate(f):
-            if (i < 500000):
+            if (i < 250000):
                 selfies_list.append(line)
     for i in selfies_list:
         if(i == None):
