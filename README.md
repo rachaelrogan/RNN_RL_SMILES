@@ -26,3 +26,8 @@ Then use ./train_prior.py to train the Prior. A pretrained Prior is included.
 To do transfer learning on a target dataset, use transfer_userinpt.py.
 
 # NOTE: This is a cloned repository to which we are making modifications for a class. We do not own the original code.
+
+Notes:
+ - Limit database size for github: limiter.py Training_Database.smiles
+ - Match databases: LimitMatch.py
+ - Convert to smiles: smiles_to_selfies.py "file to convert"
