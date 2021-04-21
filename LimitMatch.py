@@ -13,7 +13,8 @@ def main(Training, Transfer):
             master.append(i)
     with open("LIMITED_" + Transfer, 'w+') as f:
         for i in master:
-            f.write(str(i))
+            if i != None:
+                f.write(str(i))
 
 if __name__ == "__main__":
     main("LIMITED_Training_Database.smiles", "Transfure_Database.csv")

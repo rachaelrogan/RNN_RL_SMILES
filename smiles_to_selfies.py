@@ -13,7 +13,8 @@ def main(file):
             selfies_list.remove(i)
     with open("SELFIES_" + file, 'w+') as f:
         for i in selfies_list:
-            f.write(str(i) + "\n")
+            if i != None:
+                f.write(str(i) + "\n")
 
 if __name__ == "__main__":
     file = sys.argv[1]
