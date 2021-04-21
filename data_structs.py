@@ -8,6 +8,7 @@ import time
 import math
 import torch
 from torch.utils.data import Dataset
+import selfies
 
 from utils import Variable
 
@@ -25,15 +26,15 @@ class Vocabulary(object):
 
     def encode(self, char_list):
         """Takes a list of characters (eg '[NH]') and encodes to array of indices"""
-        smiles_matrix = np.zeros(len(char_list), dtype=np.float32)
+        selfies_matrix = np.zeros(len(char_list), dtype=np.float32)
         for i, char in enumerate(char_list):
             if char in self.vocab:
                 smiles_matrix[i] = self.vocab[char]
 
-        return smiles_matrix
+        return selfies_matrix
 
     def decode(self, matrix): ### change to SELFIES
-        """Takes an array of indices and returns the corresponding SMILES"""
+        """Takes an array of indices and returns the corresponding SELFIES"""
         chars = []
         for i in matrix:
             if i == self.vocab['EOS']: break
@@ -147,19 +148,19 @@ def tokenize(smiles): ### change to SELFIES
     tokenized.append('EOS')
     return tokenized
 
-def canonicalize_smiles_from_file(fname): ### change to SELFIES
-    """Reads a SMILES file and returns a list of RDKIT SMILES"""
+def canonicalize_selfies_from_file(fname): ### change to SELFIES
+    """Reads a SELFIES file and returns a list of RDKIT SMILES"""
     with open(fname, 'r') as f:
         smiles_list = []
         for i, line in enumerate(f):
             #print("i: ", i)
-            if i % 100000 == 0:
+            if i % 10 == 0:
                 print("{} lines processed.".format(i))
-            smiles = line.split(" ")[0]
-            mol = Chem.MolFromSmiles(smiles)
+            selfie = line.split(" ")[0]
+            mol = Chem.MolFromSmiles(selfies.decoder(selfie)) ### Need to find replacement for RDkit package, for now we convert back to selfies
             if filter_mol(mol):
                 smiles_list.append(Chem.MolToSmiles(mol))
-        print("{} SMILES retrieved".format(len(smiles_list)))
+        print("{} SELFIES retrieved".format(len(smiles_list)))
         #print("smiles_list: ", smiles_list)
         return smiles_list
 
@@ -288,9 +289,9 @@ def mask_seq(seqs, seq_lens):
     return mask
 
 if __name__ == "__main__":
-    smiles_file = sys.argv[1]
+    selfies_file = sys.argv[1]
     print("Reading smiles...")
-    smiles_list = canonicalize_smiles_from_file(smiles_file)
+    smiles_list = canonicalize_selfies_from_file(smiles_file)
     print("Constructing vocabulary...")
     voc_chars = construct_vocabulary(smiles_list)
     write_smiles_to_file(smiles_list, "data/danish.smi")
