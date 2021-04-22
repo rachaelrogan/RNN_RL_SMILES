@@ -149,22 +149,26 @@ def tokenize(smiles): ### change to SELFIES
     return tokenized
 
 def canonicalize_selfies_from_file(fname): ### change to SELFIES
-    """Reads a SELFIES file and returns a list of RDKIT SMILES"""
+    """Reads a SMILES file and returns a list of RDKIT SMILES"""
     with open(fname, 'r') as f:
         smiles_list = []
-        for i, selfie in enumerate(f):
+        for i, line in enumerate(f):
             #print("i: ", i)
             if i % 10 == 0:
                 print("{} lines processed.".format(i))
-            smile = selfies.decoder(str(selfie.split())[2:-2], print_error=True)
-            if smile != None:
-                mol = Chem.MolFromSmiles((smile)) ### Need to find replacement for RDkit package, for now we convert back to selfies
-                print(mol)
-                if filter_mol(mol):
-                    smiles_list.append(Chem.MolToSmiles(mol))
+            smile = line.split(" ")[0]
+            # smile = selfies.decoder(str(selfie.split())[2:-2], print_error=True)
+            mol = Chem.MolFromSmiles((smile)) ### Need to find replacement for RDkit package, for now we convert back to selfies
+            if filter_mol(mol):
+                smiles_list.append(Chem.MolToSmiles(mol))
         print("{} SELFIES retrieved".format(len(smiles_list)))
         #print("smiles_list: ", smiles_list)
-        return smiles_list
+        selfies_list = []
+        for i in smiles_list:
+            selfie = selfies.encoder(i, print_error=True)
+            if selfie != None:
+                selfies_list.append(selfie)
+        return selfies_list
 
 def filter_mol(mol, max_heavy_atoms=50, min_heavy_atoms=10, element_list=[6,7,8,9,16,17,35,33,51]):
     """Filters molecules on number of heavy atoms and atom types"""
@@ -229,9 +233,11 @@ def construct_vocabulary(smiles_list): ### change to SELFIES
        Uses regex to find characters/tokens of the format '[x]'."""
     add_chars = set()
     for i, smiles in enumerate(smiles_list):
-        regex = '(\[[^\[\]]{1,6}\])'
-        smiles = replace_halogen(smiles)
-        char_list = re.split(regex, smiles)
+        char_list = (selfies.split_selfies(smiles))
+
+        # regex = '(\[[^\[\]]{1,6}\])'
+        # smiles = replace_halogen(smiles)
+        # char_list = re.split(regex, smiles)
         for char in char_list:
             if char.startswith('['):
                 add_chars.add(char)
