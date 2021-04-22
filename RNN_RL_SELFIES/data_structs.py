@@ -177,10 +177,13 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
         # selfies.set_semantic_constraints(new_constraints)  # update constraints
         # print("constraints: ", selfies.get_semantic_constraints())
         for i, line in enumerate(f):
-            #print("line:", line)
-            encoded = selfies.encoder(line, print_error=True)
-            #  print("encoded: ", encoded)
-            selfies_list.append(encoded)
+            smiles = line.split(" ")[0]
+            mol = Chem.MolFromSmiles(smiles)
+            if filter_mol(mol):
+                print("passed if")  
+                encoded = selfies.encoder(mol, print_error=True)
+                # print("encoded: ", encoded)
+                selfies_list.append(encoded)
         print("{} SMILES retrieved".format(len(selfies_list)))
         return selfies_list
 
