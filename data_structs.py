@@ -152,14 +152,14 @@ def canonicalize_selfies_from_file(fname): ### change to SELFIES
     """Reads a SELFIES file and returns a list of RDKIT SMILES"""
     with open(fname, 'r') as f:
         smiles_list = []
-        for i, line in enumerate(f):
+        for i, selfie in enumerate(f):
             #print("i: ", i)
             if i % 10 == 0:
                 print("{} lines processed.".format(i))
-            selfie = line.split(" ")[0]
-            smile = selfies.decoder(selfie)
+            smile = selfies.decoder(str(selfie.split())[2:-2], print_error=True)
             if smile != None:
-                mol = Chem.MolFromSmiles(selfies.decoder(selfie)) ### Need to find replacement for RDkit package, for now we convert back to selfies
+                mol = Chem.MolFromSmiles((smile)) ### Need to find replacement for RDkit package, for now we convert back to selfies
+                print(mol)
                 if filter_mol(mol):
                     smiles_list.append(Chem.MolToSmiles(mol))
         print("{} SELFIES retrieved".format(len(smiles_list)))
