@@ -9,6 +9,7 @@ import math
 import torch
 from torch.utils.data import Dataset
 import selfies
+from smiles_to_selfies import convert
 
 from utils import Variable
 
@@ -179,9 +180,8 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
         for i, line in enumerate(f):
             smiles = line.split(" ")[0]
             mol = Chem.MolFromSmiles(smiles)
-            if filter_mol(mol):
-                print("passed if")  
-                encoded = selfies.encoder(mol, print_error=True)
+            if filter_mol(mol):  
+                encoded = convert(smiles)
                 # print("encoded: ", encoded)
                 selfies_list.append(encoded)
         print("{} SMILES retrieved".format(len(selfies_list)))
@@ -262,15 +262,20 @@ def construct_vocabulary(selfies_list, fname): ### change to SELFIES
     #             chars = [unit for unit in char]
     #             [add_chars.add(unit) for unit in chars]
 
-    add_chars = [] 
+    # add_chars = []
+    add_chars = set()
     print("selfies_list", selfies_list)
-    for selfies_string in selfies_list:
-        
-        add_chars.append(selfies.get_alphabet_from_selfies(selfies_string))
+    for selfie in selfies_list:
+        # add_chars.append(selfies.get_alphabet_from_selfies(selfie))
+        symbols = selfies.split_selfies(selfie)
+        for symbol in symbols:
+            add_chars.add(symbol)
+
     print("Number of characters: {}".format(len(add_chars)))
     with open(fname, 'w') as f:
         for char in add_chars:
             f.write(char + "\n")
+    print("add_chars", add_chars)
     return add_chars
 
 def can_smi_file(fname):
@@ -322,7 +327,7 @@ if __name__ == "__main__":
     smiles_file = sys.argv[1]
     print("Reading smiles...")
     selfies_list = canonicalize_smiles_from_file(smiles_file)
-    print("selfies_list", selfies_list)
-    # print("Constructing vocabulary...")
-    # voc_chars = construct_vocabulary(selfies_list, 'data/Voc_danish')
+    # print("selfies_list", selfies_list)
+    print("Constructing vocabulary...")
+    voc_chars = construct_vocabulary(selfies_list, 'data/Voc_danish')
     # write_smiles_to_file(selfies_list, "data/danish.smi")
