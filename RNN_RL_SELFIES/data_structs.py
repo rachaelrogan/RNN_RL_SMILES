@@ -9,6 +9,7 @@ import math
 import torch
 from torch.utils.data import Dataset
 import selfies
+from smiles_to_selfies import convert
 
 from utils import Variable
 
@@ -177,10 +178,12 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
         # selfies.set_semantic_constraints(new_constraints)  # update constraints
         # print("constraints: ", selfies.get_semantic_constraints())
         for i, line in enumerate(f):
-            #print("line:", line)
-            encoded = selfies.encoder(line, print_error=True)
-            #  print("encoded: ", encoded)
-            selfies_list.append(encoded)
+            smiles = line.split(" ")[0]
+            mol = Chem.MolFromSmiles(smiles)
+            if filter_mol(mol):  
+                encoded = convert(smiles)
+                # print("encoded: ", encoded)
+                selfies_list.append(encoded)
         print("{} SMILES retrieved".format(len(selfies_list)))
         return selfies_list
 
@@ -259,15 +262,20 @@ def construct_vocabulary(selfies_list, fname): ### change to SELFIES
     #             chars = [unit for unit in char]
     #             [add_chars.add(unit) for unit in chars]
 
-    add_chars = [] 
+    # add_chars = []
+    add_chars = set()
     print("selfies_list", selfies_list)
-    for selfies_string in selfies_list:
-        
-        add_chars.append(selfies.get_alphabet_from_selfies(selfies_string))
+    for selfie in selfies_list:
+        # add_chars.append(selfies.get_alphabet_from_selfies(selfie))
+        symbols = selfies.split_selfies(selfie)
+        for symbol in symbols:
+            add_chars.add(symbol)
+
     print("Number of characters: {}".format(len(add_chars)))
     with open(fname, 'w') as f:
         for char in add_chars:
             f.write(char + "\n")
+    print("add_chars", add_chars)
     return add_chars
 
 def can_smi_file(fname):
@@ -315,11 +323,21 @@ def mask_seq(seqs, seq_lens):
         mask[i, 0:length] = seqs[i, 0:length]
     return mask
 
+def write_selfies_to_file(file, selfies_strings):
+    with open("SELFIES_" + file, 'w+') as f:
+        for i in selfies_list:
+            if i != None:
+                f.write(str(i) + "\n")
+
 if __name__ == "__main__":
-    smiles_file = sys.argv[1]
+    smiles_file = sys.argv[1] # the SMILES file we are translating from
+    selfies_vocab_file = sys.argv[2] # the SELFIES file we are writing the vocabulary to
+    empty_selfies_file = sys.argv[3]
+    selfies_vocab_file = 'data/' + selfies_vocab_file
     print("Reading smiles...")
     selfies_list = canonicalize_smiles_from_file(smiles_file)
-    print("selfies_list", selfies_list)
-    # print("Constructing vocabulary...")
-    # voc_chars = construct_vocabulary(selfies_list, 'data/Voc_danish')
+    # print("selfies_list", selfies_list)
+    print("Constructing vocabulary...")
+    voc_chars = construct_vocabulary(selfies_list, selfies_vocab_file)
+    write_selfies_to_file(empty_selfies_file, selfies_list)
     # write_smiles_to_file(selfies_list, "data/danish.smi")

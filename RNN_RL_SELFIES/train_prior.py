@@ -1,5 +1,5 @@
 #!usr/bin/env python
-
+import sys
 import torch
 from torch.utils.data import DataLoader
 import pickle
@@ -12,16 +12,19 @@ from utils import Variable, decrease_learning_rate
 rdBase.DisableLog('rdApp.error')
 
 
-def pretrain(restore_from=None):
+def pretrain(vocab_file, data_file, restore_from=None):
     "Train the Prior RNN"
 
     # Reads vocabulary from a file
     # voc = Vocabulary(init_from_file="data/Voc")
-    voc = Vocabulary(init_from_file="mols.smi")
+    # voc = Vocabulary(init_from_file="mols.smi")
+    voc = Vocabulary(init_from_file=vocab_file)
 
     # Create a Dataset from a SMILES file
     # moldata = MolData("data/ChEMBL_filtered", voc)
-    moldata = MolData("data/danish.smi", voc)
+    # moldata = MolData("data/danish.smi", voc)
+    # moldata = MolData("data/Voc_danish_Selfies_mol", voc) # needs to be the translated SELFIES file
+    moldata = MolData(data_file, voc)
     data = DataLoader(moldata, batch_size=128, shuffle=True, drop_last=True,
                      collate_fn=MolData.collate_fn)
     print("in pretrain(), voc: ", voc)
@@ -73,6 +76,8 @@ def pretrain(restore_from=None):
 
 
 if __name__ == '__main__':
-    pretrain()
+    voc_file = sys.argv[1] # the vocabulary created from data_structs.py
+    dataset_file = sys.argv[2] # the SELFIES file that was generated in data_structs.py
+    pretrain(voc_file)
 
 
