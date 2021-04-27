@@ -1,3 +1,4 @@
+
 import selfies
 import sys
 
@@ -16,6 +17,6 @@ def main(file):
             if i != None:
                 f.write(str(i) + "\n")
 
-if __name__ == "__main__":
-    file = sys.argv[1]
-    main(file)
+# if __name__ == "__main__":
+#     file = sys.argv[1]
+#     main(file)

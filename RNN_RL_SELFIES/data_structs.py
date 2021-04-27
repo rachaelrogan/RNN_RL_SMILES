@@ -323,11 +323,21 @@ def mask_seq(seqs, seq_lens):
         mask[i, 0:length] = seqs[i, 0:length]
     return mask
 
+def write_selfies_to_file(file, selfies_strings):
+    with open("SELFIES_" + file, 'w+') as f:
+        for i in selfies_list:
+            if i != None:
+                f.write(str(i) + "\n")
+
 if __name__ == "__main__":
-    smiles_file = sys.argv[1]
+    smiles_file = sys.argv[1] # the SMILES file we are translating from
+    selfies_vocab_file = sys.argv[2] # the SELFIES file we are writing the vocabulary to
+    empty_selfies_file = sys.argv[3]
+    selfies_vocab_file = 'data/' + selfies_vocab_file
     print("Reading smiles...")
     selfies_list = canonicalize_smiles_from_file(smiles_file)
     # print("selfies_list", selfies_list)
     print("Constructing vocabulary...")
-    voc_chars = construct_vocabulary(selfies_list, 'data/Voc_danish')
+    voc_chars = construct_vocabulary(selfies_list, selfies_vocab_file)
+    write_selfies_to_file(empty_selfies_file, selfies_list)
     # write_smiles_to_file(selfies_list, "data/danish.smi")
