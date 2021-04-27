@@ -341,3 +341,6 @@ if __name__ == "__main__":
     voc_chars = construct_vocabulary(selfies_list, selfies_vocab_file)
     write_selfies_to_file(empty_selfies_file, selfies_list)
     # write_smiles_to_file(selfies_list, "data/danish.smi")
+
+
+# python data_structs.py mols.smi Voc_danish danish.smi
