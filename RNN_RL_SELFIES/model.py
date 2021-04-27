@@ -106,7 +106,6 @@ class RNN():
         start_token[:] = self.voc.vocab['GO']
         h = self.rnn.init_h(batch_size)
         x = start_token
-        print("here1")
 
         sequences = []
         log_probs = Variable(torch.zeros(batch_size))
@@ -115,24 +114,15 @@ class RNN():
         if torch.cuda.is_available():
             finished = finished.cuda()
 
-        print("here2")
         for step in range(max_length):
             
-            print("here3")
             logits, h = self.rnn(x, h)
-            print("here4")
             prob = F.softmax(logits, dim=1)
-            print("here5")
             log_prob = F.log_softmax(logits, dim=1)
-            print("here6")
             x = torch.multinomial(prob,1).view(-1)
-            print("here7")
             sequences.append(x.view(-1, 1))
-            print("here8")
             log_probs +=  NLLLoss(log_prob, x)
-            print("here9")
             entropy += -torch.sum((log_prob * prob), 1)
-            print("here0")
 
             x = Variable(x.data)
             EOS_sampled = (x == self.voc.vocab['EOS']).data

@@ -16,7 +16,7 @@ import pandas as pd
 rdBase.DisableLog('rdApp.error')
 
 
-def cano_smi_file(fname, outfn):
+def cano_selfies_file(fname, outfn):
     """
     canonicalize smile file
     Args:
@@ -52,7 +52,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
     """
     voc = Vocabulary(init_from_file=voc_dir)
     #cano_smi_file('all_smi_refined.csv', 'all_smi_refined_cano.csv') # writes to a file
-    cano_smi_file('data/refined_smi_test.csv', 'all_smi_refined_cano.csv')
+    cano_selfies_file('data/refined_selfies_test.csv', 'all_selfies_refined_cano.csv')
     moldata = MolData(smi_dir, voc)
     # Monomers 67 and 180 were removed because of the unseen [C-] in voc
     # DAs containing [C] removed: 43 molecules in 5356; Ge removed: 154 in 5356; [c] removed 4 in 5356
@@ -81,7 +81,6 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
             seqs = batch.long()
             log_p, _ = transfer_model.likelihood(seqs)
             loss = -log_p.mean()
-
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -101,10 +100,8 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
                 tqdm.write("*"*50 + '\n')
                 torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
-        print("here9")
         valid = 0
         #valid_smis = []
-        print("HERE")
         for i, seq in enumerate(seqs.cpu().numpy()):
             smile = voc.decode(seq)
             if Chem.MolFromSmiles(smile):
@@ -135,7 +132,6 @@ def sample_smiles(voc_dir, nums, outfn,tf_dir, until=False):
     else:
         transfer_model.rnn.load_state_dict(torch.load(tf_dir,
                                                     map_location=lambda storage, loc:storage))
-
     for param in transfer_model.rnn.parameters():
         param.requires_grad = False
 
@@ -162,7 +158,7 @@ def sample_smiles(voc_dir, nums, outfn,tf_dir, until=False):
         tqdm.write('\n{} molecules sampled, {} valid SMILES, {} with double Br'.format(nums, valid, double_br))
         output.close()
     else:
-        valid = 0;
+        valid = 0
         n_sample = 0
         while valid < nums:
             seq, likelihood, _ = transfer_model.sample(1)
@@ -193,7 +189,7 @@ if __name__ == "__main__":
                         # default='data/Voc_withda', help='Directory for the vocabulary')
     # parser.add_argument('--smi', action='store', dest='smi_dir', default='cano_acceptors_smi.csv',
     # parser.add_argument('--smi', action='store', dest='smi_dir', default='deepsmile_test/monomer_db.csv',
-    parser.add_argument('--smi', action='store', dest='smi_dir', default='mols.smi',
+    parser.add_argument('--smi', action='store', dest='smi_dir', default='data\SELFIES_danish.smi',
                         help='Directory of the SMILES file for tranfer learning')
     # parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_gua_withda.ckpt',
     parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_local.ckpt',

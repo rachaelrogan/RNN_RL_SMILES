@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 import pickle
 from rdkit import Chem, rdBase
 from tqdm import tqdm
-
+import selfies
 from data_structs import MolData, Vocabulary
 from model import RNN
 from utils import Variable, decrease_learning_rate
@@ -25,8 +25,10 @@ def pretrain(vocab_file, data_file, restore_from=None):
     # moldata = MolData("data/danish.smi", voc)
     # moldata = MolData("data/Voc_danish_Selfies_mol", voc) # needs to be the translated SELFIES file
     moldata = MolData(data_file, voc)
-    data = DataLoader(moldata, batch_size=128, shuffle=True, drop_last=True,
+    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=True,
                      collate_fn=MolData.collate_fn)
+
+    # print("data", data)
     print("in pretrain(), voc: ", voc)
     Prior = RNN(voc)
 
@@ -41,8 +43,9 @@ def pretrain(vocab_file, data_file, restore_from=None):
         # in a few of epochs or even faster. If model sized is increased
         # its probably a good idea to check loss against an external set of
         # validation SMILES to make sure we dont overfit too much.
+        # print("len(data)", len(data))
         for step, batch in tqdm(enumerate(data), total=len(data)):
-
+            
             # Sample from Dataloader
             seqs = batch.long()
 
@@ -56,15 +59,17 @@ def pretrain(vocab_file, data_file, restore_from=None):
             optimizer.step()
 
             # Every 500 steps we decrease learning rate and print some information
-            if step % 500 == 0 and step != 0:
+            if step % 10 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
                 tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data[0]))
                 seqs, likelihood, _ = Prior.sample(128)
                 valid = 0
                 for i, seq in enumerate(seqs.cpu().numpy()):
+                    # print("seq", seq)
                     smile = voc.decode(seq)
-                    if Chem.MolFromSmiles(smile):
+                    print("smile", smile)
+                    if selfies.decoder(smile.strip()) != None:
                         valid += 1
                     if i < 5:
                         tqdm.write(smile)
@@ -78,6 +83,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
 if __name__ == '__main__':
     voc_file = sys.argv[1] # the vocabulary created from data_structs.py
     dataset_file = sys.argv[2] # the SELFIES file that was generated in data_structs.py
-    pretrain(voc_file)
+    pretrain(voc_file, dataset_file)
 
 
+#  python train_prior.py data\Voc_danish data\SELFIES_danish.smi

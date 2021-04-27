@@ -102,6 +102,7 @@ class MolData(Dataset): ### change to SELFIES
         tokenized = self.voc.tokenize(mol)
         print("tokenized", tokenized)
         encoded = self.voc.encode(tokenized)
+        print("encoded", encoded)
         if encoded is not None:
             return Variable(encoded)
 

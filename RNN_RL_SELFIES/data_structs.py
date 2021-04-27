@@ -47,7 +47,7 @@ class Vocabulary(object):
     def tokenize(self, smiles): ### change to SELFIES
         """Takes a SMILES and return a list of characters/tokens"""
         regex = '(\[[^\[\]]{1,6}\])'
-        smiles = replace_halogen(smiles)
+        # smiles = replace_halogen(smiles)
         char_list = re.split(regex, smiles)
         tokenized = []
         for char in char_list:
@@ -101,10 +101,15 @@ class MolData(Dataset): ### change to SELFIES
 
     def __getitem__(self, i):
         mol = self.smiles[i]
-        tokenized = self.voc.tokenize(mol)
-        print("tokenized", tokenized)
-        encoded = self.voc.encode(tokenized)
+        print("mol", mol)
+        # tokenized = self.voc.tokenize(mol)
+        # encoded = self.voc.encode(tokenized)
+        vocab_stoi = dict()
+        # needs to be the second argument into selfies.selfies_to_encoding; should this be the length of the vocabulary or the selfies string itself? - I belive the vocab.. I may be very wrogn on that through
+        #  :param vocab_stoi: a dictionary that maps SELFIES symbols (the keys) to a non-negative index. The indices of the dictionary must contiguous, starting from 0. ^ I think that makes sense because we want them all to be the same length? - Yes? :)
+        encoded = selfies.selfies_to_encoding(mol, vocab_stoi) 
         if encoded is not None:
+            print("encoded", encoded)
             return Variable(encoded)
 
     def __len__(self):
