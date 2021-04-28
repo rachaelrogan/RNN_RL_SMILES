@@ -24,3 +24,8 @@ A filtered file containing around 1.1 million SMILES from the Guacamol is provid
 Then use ./train_prior.py to train the Prior. A pretrained Prior is included.
 
 To do transfer learning on a target dataset, use transfer_userinpt.py.
+
+
+____
+python data_structs.py mols.smi Voc_danish danish.smi 
+

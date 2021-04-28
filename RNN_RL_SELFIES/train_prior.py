@@ -86,4 +86,4 @@ if __name__ == '__main__':
     pretrain(voc_file, dataset_file)
 
 
-#  python train_prior.py data\Voc_danish data\SELFIES_danish.smi
+#  python train_prior.py data/Voc_danish data/SELFIES_danish.smi

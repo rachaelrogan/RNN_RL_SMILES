@@ -101,13 +101,20 @@ class MolData(Dataset): ### change to SELFIES
 
     def __getitem__(self, i):
         mol = self.smiles[i]
-        print("mol", mol)
         # tokenized = self.voc.tokenize(mol)
         # encoded = self.voc.encode(tokenized)
-        vocab_stoi = dict()
+        vocab_stoi = []
+        with open("data/Voc_danish", 'r')as f:
+            dic = f.readlines()
+        for i in dic:
+            vocab_stoi.append(i.strip)
+        pad_to_len = max(selfies.len_selfies(s) for s in self)
         # needs to be the second argument into selfies.selfies_to_encoding; should this be the length of the vocabulary or the selfies string itself? - I belive the vocab.. I may be very wrogn on that through
         #  :param vocab_stoi: a dictionary that maps SELFIES symbols (the keys) to a non-negative index. The indices of the dictionary must contiguous, starting from 0. ^ I think that makes sense because we want them all to be the same length? - Yes? :)
-        encoded = selfies.selfies_to_encoding(mol, vocab_stoi) 
+        encoded = selfies.selfies_to_encoding(mol,
+                             vocab_stoi=vocab_stoi,
+                             pad_to_len=pad_to_len,
+                             enc_type='label')
         if encoded is not None:
             print("encoded", encoded)
             return Variable(encoded)
@@ -230,12 +237,10 @@ def filter_file_on_chars(smiles_fname, voc_fname): ### change to SELFIES
     with open(smiles_fname, 'r') as f:
         for line in f:
             smiles.append(line.split()[0])
-    print(smiles[:10])
     chars = []
     with open(voc_fname, 'r') as f:
         for line in f:
             chars.append(line.split()[0])
-    print(chars)
     valid_smiles = filter_on_chars(smiles, chars)
     with open(smiles_fname + "_filtered", 'w') as f:
         for smiles in valid_smiles:
@@ -269,7 +274,6 @@ def construct_vocabulary(selfies_list, fname): ### change to SELFIES
 
     # add_chars = []
     add_chars = set()
-    print("selfies_list", selfies_list)
     for selfie in selfies_list:
         # add_chars.append(selfies.get_alphabet_from_selfies(selfie))
         symbols = selfies.split_selfies(selfie)
@@ -280,7 +284,6 @@ def construct_vocabulary(selfies_list, fname): ### change to SELFIES
     with open(fname, 'w') as f:
         for char in add_chars:
             f.write(char + "\n")
-    print("add_chars", add_chars)
     return add_chars
 
 def can_smi_file(fname):
