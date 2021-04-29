@@ -63,13 +63,21 @@ class RNN():
         #for i, seq in enumerate(arr):
         #    collated_arr[i, :seq.size(0)] = seq
         #return collated_arr
+        print("target in likelihood", target)
         seq_lens, target = pad_seq(target)
+        print("seq_lens", seq_lens)
         target = Variable(target)
+        print("target", target)
         batch_size, seq_length = target.size()
+        print("batch_size", batch_size)
+        print("seq_length", seq_length)
         start_token = Variable(torch.zeros(batch_size, 1).long())
+        print("start_token", start_token)
         start_token[:] = self.voc.vocab['GO']
+        print("start_token", start_token)
         # x is one step behand target, use step n-1 of x to generate step n of target
         x = torch.cat((start_token, target[:, :-1]), 1)
+        print("x", x)
         h = self.rnn.init_h(batch_size)
 
         log_probs = Variable(torch.zeros(batch_size))
@@ -106,7 +114,6 @@ class RNN():
         start_token[:] = self.voc.vocab['GO']
         h = self.rnn.init_h(batch_size)
         x = start_token
-        print("here1")
 
         sequences = []
         log_probs = Variable(torch.zeros(batch_size))
@@ -115,24 +122,15 @@ class RNN():
         if torch.cuda.is_available():
             finished = finished.cuda()
 
-        print("here2")
         for step in range(max_length):
             
-            print("here3")
             logits, h = self.rnn(x, h)
-            print("here4")
             prob = F.softmax(logits, dim=1)
-            print("here5")
             log_prob = F.log_softmax(logits, dim=1)
-            print("here6")
             x = torch.multinomial(prob,1).view(-1)
-            print("here7")
             sequences.append(x.view(-1, 1))
-            print("here8")
             log_probs +=  NLLLoss(log_prob, x)
-            print("here9")
             entropy += -torch.sum((log_prob * prob), 1)
-            print("here0")
 
             x = Variable(x.data)
             EOS_sampled = (x == self.voc.vocab['EOS']).data

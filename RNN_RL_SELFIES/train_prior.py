@@ -49,6 +49,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
             
             # Sample from Dataloader
             seqs = batch.long()
+            print("seqs", seqs)
 
             # Calculate loss
             log_p, _ = Prior.likelihood(seqs)
@@ -64,17 +65,17 @@ def pretrain(vocab_file, data_file, restore_from=None):
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
                 tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, (loss.data.ndimension())))
-                seqs, likelihood, _ = Prior.sample(128)
-                valid = 0
-                for i, seq in enumerate(seqs.cpu().numpy()): # did we deicde we didn't need this? - We do still need the if statment to determin valid strings, becuase were not handling them as selfies strings until we convert them back
-                    # print("seq", seq)
-                    smile = voc.decode(seq)
-                    # print("smile", smile)
-                    if selfies.decoder(smile.strip()) != None:
-                        valid += 1
-                    # if i < 5:
-                    #     tqdm.write(smile) Does this do anything other then print the smile string to console?
-                tqdm.write("\n{:>4.1f}% valid SELFIES".format(100 * valid / len(seqs)))
+                # seqs, likelihood, _ = Prior.sample(128)
+                # valid = 0
+                # for i, seq in enumerate(seqs.cpu().numpy()): # did we deicde we didn't need this? - We do still need the if statment to determin valid strings, becuase were not handling them as selfies strings until we convert them back
+                #     print("seq", seq)
+                #     smile = voc.decode(seq)
+                #     print("smile", smile)
+                #     if selfies.decoder(smile.strip()) != None:
+                #         valid += 1
+                #     if i < 5:
+                #         tqdm.write(smile) Does this do anything other then print the smile string to console?
+                # tqdm.write("\n{:>4.1f}% valid SELFIES".format(100 * valid / len(seqs)))
                 tqdm.write('*'*50 + '\n')
                 torch.save(Prior.rnn.state_dict(), 'data/Prior_local.ckpt')
         # Save the prior
