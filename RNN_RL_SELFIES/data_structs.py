@@ -103,18 +103,16 @@ class MolData(Dataset): ### change to SELFIES
         mol = self.smiles[i]
         # tokenized = self.voc.tokenize(mol)
         # encoded = self.voc.encode(tokenized)
-        vocab_stoi = []
+        vocab_stoi = {}
         with open("data/Voc_danish", 'r')as f:
             dic = f.readlines()
-        for i in dic:
-            vocab_stoi.append(i.strip)
-        pad_to_len = max(selfies.len_selfies(s) for s in self)
+        for i in range(0,len(dic)):
+            vocab_stoi[(dic[i].strip())] = i
+        pad_to_len = selfies.len_selfies(mol)
         # needs to be the second argument into selfies.selfies_to_encoding; should this be the length of the vocabulary or the selfies string itself? - I belive the vocab.. I may be very wrogn on that through
         #  :param vocab_stoi: a dictionary that maps SELFIES symbols (the keys) to a non-negative index. The indices of the dictionary must contiguous, starting from 0. ^ I think that makes sense because we want them all to be the same length? - Yes? :)
-        encoded = selfies.selfies_to_encoding(mol,
-                             vocab_stoi=vocab_stoi,
-                             pad_to_len=pad_to_len,
-                             enc_type='label')
+        
+        encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
         if encoded is not None:
             print("encoded", encoded)
             return Variable(encoded)
