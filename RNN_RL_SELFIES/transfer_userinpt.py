@@ -52,12 +52,12 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
     """
     voc = Vocabulary(init_from_file=voc_dir)
     #cano_smi_file('all_smi_refined.csv', 'all_smi_refined_cano.csv') # writes to a file
-    cano_selfies_file('data/refined_selfies_test.csv', 'all_selfies_refined_cano.csv')
+    # cano_selfies_file('data/refined_selfies_test.csv', 'all_selfies_refined_cano.csv')
     moldata = MolData(smi_dir, voc)
     # Monomers 67 and 180 were removed because of the unseen [C-] in voc
     # DAs containing [C] removed: 43 molecules in 5356; Ge removed: 154 in 5356; [c] removed 4 in 5356
     # [S] 1 molecule in 5356
-    data = DataLoader(moldata, batch_size=64, shuffle=True, drop_last=False,
+    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=False,
                       collate_fn=MolData.collate_fn)
     print("inside train_model voc.vocab_size: ", voc.vocab_size)
     transfer_model = RNN(voc)

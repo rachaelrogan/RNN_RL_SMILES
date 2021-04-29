@@ -63,21 +63,21 @@ class RNN():
         #for i, seq in enumerate(arr):
         #    collated_arr[i, :seq.size(0)] = seq
         #return collated_arr
-        print("target in likelihood", target)
+        # print("target in likelihood", target)
         seq_lens, target = pad_seq(target)
-        print("seq_lens", seq_lens)
+        # print("seq_lens", seq_lens)
         target = Variable(target)
-        print("target", target)
+        # print("target", target)
         batch_size, seq_length = target.size()
-        print("batch_size", batch_size)
-        print("seq_length", seq_length)
+        # print("batch_size", batch_size)
+        # print("seq_length", seq_length)
         start_token = Variable(torch.zeros(batch_size, 1).long())
-        print("start_token", start_token)
+        # print("start_token", start_token)
         start_token[:] = self.voc.vocab['GO']
-        print("start_token", start_token)
+        # print("start_token", start_token)
         # x is one step behand target, use step n-1 of x to generate step n of target
         x = torch.cat((start_token, target[:, :-1]), 1)
-        print("x", x)
+        # print("x", x)
         h = self.rnn.init_h(batch_size)
 
         log_probs = Variable(torch.zeros(batch_size))
