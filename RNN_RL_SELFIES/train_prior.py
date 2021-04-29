@@ -63,7 +63,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
             if step % 10 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
-                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data[0]))
+                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, (loss.data.ndimension())))
                 seqs, likelihood, _ = Prior.sample(128)
                 valid = 0
                 for i, seq in enumerate(seqs.cpu().numpy()): # did we deicde we didn't need this?
