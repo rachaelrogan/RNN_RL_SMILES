@@ -16,16 +16,24 @@ Scikit-Learn (for QSAR scoring function)
 tqdm (for training Prior)
 
 ## Usage
-To train a Prior model starting with a SMILES file called mols.smi:
+First, we must translate our SMILES strings into SELFIES strings and generate a vocabulary from those SELFIES strings to train our model with. To do this, run:
 
-First filter the SMILES and construct a vocabulary from the remaining sequences. ./data_structs.py mols.smi - Will generate data/CEP_cano.smi and data/Voc_cep.
-A filtered file containing around 1.1 million SMILES from the Guacamol is provided in ChEMBL_from_gua_filter.smi.
+python data_structs.py mols.smi Voc_danish danish.smi 
 
-Then use ./train_prior.py to train the Prior. A pretrained Prior is included.
+where
+- mols.smi - the SMILES file on which you want to train
+- Voc_danish - the SELFIES file we are writing the vocabulary to (this will be placed in the data folder)
+- danish.smi - the SELFIES file to which we are writing the translated strings (this will be a file containing all the same molecules as mols.smi but translated into SELFIES strings and will be placed in the data folder)
+
+Next, we want to train our Prior model and save it in our data folder. To do this, run:
+
+python train_prior.py data/Voc_danish data/SELFIES_danish.smi
+
+where
+- data/Voc_danish - the vocabulary we created from running data_structs.py as above
+- data/SELFIES_danish.smi - the SELFIES file we created from running data_structs.py as above
 
 To do transfer learning on a target dataset, use transfer_userinpt.py.
 
 
-____
-python data_structs.py mols.smi Voc_danish danish.smi 
 
