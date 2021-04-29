@@ -14,6 +14,7 @@ import torch.nn as nn
 import argparse
 import pandas as pd
 rdBase.DisableLog('rdApp.error')
+import selfies
 
 
 def cano_selfies_file(fname, outfn):
@@ -87,23 +88,36 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
             if step % 80 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
-                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data[0]))
-                seqs, likelihood, _ = transfer_model.sample(128)
-                valid = 0
-                for i, seq in enumerate(seqs.cpu().numpy()):
-                    smile = voc.decode(seq)
-                    if Chem.MolFromSmiles(smile):
-                        valid += 1
-                    if i < 5:
-                        tqdm.write(smile)
-                tqdm.write("\n{:>4.1f}% valid SMILES".format(100*valid/len(seqs)))
+                # tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data[0]))
+                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data.item()))
+                # seqs, likelihood, _ = transfer_model.sample(128)
+                # valid = 0
+                # for i, seq in enumerate(seqs.cpu().numpy()):
+                #     smile = voc.decode(seq)
+                #     if Chem.MolFromSmiles(smile):
+                #         valid += 1
+                #     if i < 5:
+                #         tqdm.write(smile)
+                # tqdm.write("\n{:>4.1f}% valid SMILES".format(100*valid/len(seqs)))
                 tqdm.write("*"*50 + '\n')
                 torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
         valid = 0
         #valid_smis = []
+        # for i, seq in enumerate(seqs.cpu().numpy()):
+        #     smile = voc.decode(seq)
+        #     if Chem.MolFromSmiles(smile):
+        #         try:
+        #             AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
+        #             valid += 1
+        #             smi_lst.append(smile)
+        #             epoch_lst.append(epoch)
+        #         except:
+        #             continue
         for i, seq in enumerate(seqs.cpu().numpy()):
-            smile = voc.decode(seq)
+            selfie = selfies.encoding_to_selfies(seq, vocab_itos=moldata.vocab_itos, enc_type="label")
+            # selfie = selfies.encoding_to_selfies(seq,)
+            smile = selfies.decoder(selfie) # convert to SMILES so we can get the Morgan Fingerprint
             if Chem.MolFromSmiles(smile):
                 try:
                     AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
@@ -115,8 +129,8 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
 
         torch.save(transfer_model.rnn.state_dict(), tf_dir)
 
-    transfer_process_df = pd.DataFrame(columns=['SMILES', 'Epoch'])
-    transfer_process_df['SMILES'] = pd.Series(data=smi_lst)
+    transfer_process_df = pd.DataFrame(columns=['SELFIES', 'Epoch'])
+    transfer_process_df['SELFIES'] = pd.Series(data=smi_lst)
     transfer_process_df['Epoch'] = pd.Series(data=epoch_lst)
     transfer_process_df.to_csv(tf_process_dir)
 

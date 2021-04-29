@@ -98,19 +98,27 @@ class MolData(Dataset): ### change to SELFIES
         with open(fname, 'r',encoding='utf-8-sig') as f:
             for line in f:
                 self.smiles.append(line.split()[0])
+        self.vocab_stoi = {}
+        self.vocab_itos = {}
+        with open("data/Voc_danish", 'r')as f:
+            dic = f.readlines()
+        for i in range(0,len(dic)):
+            self.vocab_stoi[(dic[i].strip())] = i
+            self.vocab_itos[i] = (dic[i].strip())
 
     def __getitem__(self, i):
         mol = self.smiles[i]
         # tokenized = self.voc.tokenize(mol)
         # encoded = self.voc.encode(tokenized)
-        vocab_stoi = {}
-        with open("data/Voc_danish", 'r')as f:
-            dic = f.readlines()
-        for i in range(0,len(dic)):
-            vocab_stoi[(dic[i].strip())] = i
+        # vocab_stoi = {}
+        # with open("data/Voc_danish", 'r')as f:
+        #     dic = f.readlines()
+        # for i in range(0,len(dic)):
+        #     vocab_stoi[(dic[i].strip())] = i
         pad_to_len = selfies.len_selfies(mol)
         
-        encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
+        # encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
+        encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
         encoded = np.array(encoded, dtype=float)
         if encoded is not None:
             return Variable(encoded)
