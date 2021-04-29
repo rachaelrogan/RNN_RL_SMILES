@@ -74,7 +74,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
                         valid += 1
                     if i < 5:
                         tqdm.write(smile)
-                tqdm.write("\n{:>4.1f}% valid SMILES".format(100 * valid / len(seqs)))
+                tqdm.write("\n{:>4.1f}% valid SELFIES".format(100 * valid / len(seqs)))
                 tqdm.write('*'*50 + '\n')
                 torch.save(Prior.rnn.state_dict(), 'data/Prior_local.ckpt')
         # Save the prior
