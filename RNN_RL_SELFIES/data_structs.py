@@ -109,8 +109,6 @@ class MolData(Dataset): ### change to SELFIES
         for i in range(0,len(dic)):
             vocab_stoi[(dic[i].strip())] = i
         pad_to_len = selfies.len_selfies(mol)
-        # needs to be the second argument into selfies.selfies_to_encoding; should this be the length of the vocabulary or the selfies string itself? - I belive the vocab.. I may be very wrogn on that through
-        #  :param vocab_stoi: a dictionary that maps SELFIES symbols (the keys) to a non-negative index. The indices of the dictionary must contiguous, starting from 0. ^ I think that makes sense because we want them all to be the same length? - Yes? :)
         
         encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
         encoded = np.array(encoded, dtype=float)
@@ -126,6 +124,7 @@ class MolData(Dataset): ### change to SELFIES
     @classmethod
     def collate_fn(cls, arr):
         """Function to take a list of encoded sequences and turn them into a batch"""
+        arr = torch.Tensor(arr)
         max_length = max([seq.size(0) for seq in arr])
         collated_arr = Variable(torch.zeros(len(arr), max_length))
         for i, seq in enumerate(arr):
