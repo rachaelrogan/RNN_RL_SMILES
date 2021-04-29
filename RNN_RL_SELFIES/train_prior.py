@@ -44,6 +44,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
         # its probably a good idea to check loss against an external set of
         # validation SMILES to make sure we dont overfit too much.
         # print("len(data)", len(data))
+        # print("data", data)
         for step, batch in tqdm(enumerate(data), total=len(data)):
             
             # Sample from Dataloader
@@ -65,10 +66,10 @@ def pretrain(vocab_file, data_file, restore_from=None):
                 tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data[0]))
                 seqs, likelihood, _ = Prior.sample(128)
                 valid = 0
-                for i, seq in enumerate(seqs.cpu().numpy()):
+                for i, seq in enumerate(seqs.cpu().numpy()): # did we deicde we didn't need this?
                     # print("seq", seq)
                     smile = voc.decode(seq)
-                    print("smile", smile)
+                    # print("smile", smile)
                     if selfies.decoder(smile.strip()) != None:
                         valid += 1
                     if i < 5:

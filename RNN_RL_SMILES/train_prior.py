@@ -22,7 +22,7 @@ def pretrain(restore_from=None):
     # Create a Dataset from a SMILES file
     # moldata = MolData("data/ChEMBL_filtered", voc)
     moldata = MolData("data/danish.smi", voc)
-    data = DataLoader(moldata, batch_size=128, shuffle=True, drop_last=True,
+    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=True,
                      collate_fn=MolData.collate_fn)
     print("in pretrain(), voc: ", voc)
     Prior = RNN(voc)
@@ -38,8 +38,10 @@ def pretrain(restore_from=None):
         # in a few of epochs or even faster. If model sized is increased
         # its probably a good idea to check loss against an external set of
         # validation SMILES to make sure we dont overfit too much.
+        print("len(data)", len(data))
+        print("data", data)
         for step, batch in tqdm(enumerate(data), total=len(data)):
-
+            print("IN LOOP")
             # Sample from Dataloader
             seqs = batch.long()
 

@@ -113,8 +113,8 @@ class MolData(Dataset): ### change to SELFIES
         #  :param vocab_stoi: a dictionary that maps SELFIES symbols (the keys) to a non-negative index. The indices of the dictionary must contiguous, starting from 0. ^ I think that makes sense because we want them all to be the same length? - Yes? :)
         
         encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
+        encoded = np.array(encoded, dtype=float)
         if encoded is not None:
-            print("encoded", encoded)
             return Variable(encoded)
 
     def __len__(self):
