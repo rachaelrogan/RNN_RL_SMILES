@@ -49,7 +49,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
             
             # Sample from Dataloader
             seqs = batch.long()
-            print("seqs", seqs)
+            # print("seqs", seqs)
 
             # Calculate loss
             log_p, _ = Prior.likelihood(seqs)
@@ -64,7 +64,9 @@ def pretrain(vocab_file, data_file, restore_from=None):
             if step % 10 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
-                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, (loss.data.ndimension())))
+                # print("loss.data", loss.data)
+                # tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, (loss.data.ndimension())))
+                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data.item()))
                 # seqs, likelihood, _ = Prior.sample(128)
                 # valid = 0
                 # for i, seq in enumerate(seqs.cpu().numpy()): # did we deicde we didn't need this? - We do still need the if statment to determin valid strings, becuase were not handling them as selfies strings until we convert them back

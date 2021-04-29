@@ -70,7 +70,7 @@ class RNN():
         start_token[:] = self.voc.vocab['GO']
         # x is one step behand target, use step n-1 of x to generate step n of target
         x = torch.cat((start_token, target[:, :-1]), 1)
-        print("x", x)
+        # print("x", x)
         h = self.rnn.init_h(batch_size)
 
         log_probs = Variable(torch.zeros(batch_size))
@@ -78,10 +78,10 @@ class RNN():
         entropy = Variable(torch.zeros(batch_size))
         for step in range(seq_length):
             logits, h = self.rnn(x[:, step], h)
-            print("logits", logits)
-            print("h", h)
+            # print("logits", logits)
+            # print("h", h)
             log_prob = F.log_softmax(logits, dim=1)
-            print("log_prob", log_prob)
+            # print("log_prob", log_prob)
             prob = F.softmax(logits, dim=1)
             #log_probs += NLLLoss(log_prob, target[:, step])
             log_losses[:, step] = NLLLoss(log_prob, target[:,step])
