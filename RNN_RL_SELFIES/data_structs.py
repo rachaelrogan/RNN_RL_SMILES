@@ -108,6 +108,7 @@ class MolData(Dataset): ### change to SELFIES
 
     def __getitem__(self, i): # we need to include 'GO' and 'EOS'
         mol = self.smiles[i]
+        # can we tokenize the special characters alone?
         # tokenized = self.voc.tokenize(mol)
         # encoded = self.voc.encode(tokenized)
         # vocab_stoi = {}
