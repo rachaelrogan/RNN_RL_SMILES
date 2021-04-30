@@ -106,7 +106,7 @@ class MolData(Dataset): ### change to SELFIES
             self.vocab_stoi[(dic[i].strip())] = i
             self.vocab_itos[i] = (dic[i].strip())
 
-    def __getitem__(self, i):
+    def __getitem__(self, i): # we need to include 'GO' and 'EOS'
         mol = self.smiles[i]
         # tokenized = self.voc.tokenize(mol)
         # encoded = self.voc.encode(tokenized)

@@ -115,6 +115,8 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
         #         except:
         #             continue
         for i, seq in enumerate(seqs.cpu().numpy()):
+            print("seq", seq)
+            print("moldata.vocab_itos", moldata.vocab_itos)
             selfie = selfies.encoding_to_selfies(seq, vocab_itos=moldata.vocab_itos, enc_type="label")
             # selfie = selfies.encoding_to_selfies(seq,)
             smile = selfies.decoder(selfie) # convert to SMILES so we can get the Morgan Fingerprint
