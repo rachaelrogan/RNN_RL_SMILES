@@ -115,19 +115,24 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
         #         except:
         #             continue
         for i, seq in enumerate(seqs.cpu().numpy()):
-            print("seq", seq)
-            print("moldata.vocab_itos", moldata.vocab_itos)
-            selfie = selfies.encoding_to_selfies(seq, vocab_itos=moldata.vocab_itos, enc_type="label")
-            # selfie = selfies.encoding_to_selfies(seq,)
-            smile = selfies.decoder(selfie) # convert to SMILES so we can get the Morgan Fingerprint
-            if Chem.MolFromSmiles(smile):
-                try:
-                    AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
-                    valid += 1
-                    smi_lst.append(smile)
-                    epoch_lst.append(epoch)
-                except:
-                    continue
+            # print("seq", seq)
+            for a in range(seq.size):
+                # print("a", a)
+                # print("seq[seq.size-1]", seq[seq.size-1])
+                if seq[a] == 18 or seq[a]==19 or a == seq.size-1:
+                    # print("seq[:a]", seq[:a])
+                    selfie = selfies.encoding_to_selfies(seq[:a], vocab_itos=moldata.vocab_itos, enc_type="label")
+                    # selfie = selfies.encoding_to_selfies(seq,)
+                    smile = selfies.decoder(selfie) # convert to SMILES so we can get the Morgan Fingerprint
+                    if Chem.MolFromSmiles(smile):
+                        try:
+                            AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
+                            valid += 1
+                            smi_lst.append(smile)
+                            epoch_lst.append(epoch)
+                        except:
+                            continue
+                    break
 
         torch.save(transfer_model.rnn.state_dict(), tf_dir)
 

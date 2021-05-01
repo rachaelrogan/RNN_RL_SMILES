@@ -46,17 +46,18 @@ class Vocabulary(object):
 
     def tokenize(self, smiles): ### change to SELFIES
         """Takes a SMILES and return a list of characters/tokens"""
-        regex = '(\[[^\[\]]{1,6}\])'
-        # smiles = replace_halogen(smiles)
-        char_list = re.split(regex, smiles)
+        # regex = '(\[[^\[\]]{1,6}\])'
+        # # smiles = replace_halogen(smiles)
+        # char_list = re.split(regex, smiles)
         tokenized = []
-        for char in char_list:
-            if char.startswith('['):
-                tokenized.append(char)
-            else:
-                chars = [unit for unit in char]
-                [tokenized.append(unit) for unit in chars]
+        # for char in char_list:
+        #     if char.startswith('['):
+        #         tokenized.append(char)
+        #     else:
+        #         chars = [unit for unit in char]
+        #         [tokenized.append(unit) for unit in chars]
         tokenized.append('EOS')
+        tokenized.append('GO')
         return tokenized
 
     def add_characters(self, chars):
@@ -105,24 +106,26 @@ class MolData(Dataset): ### change to SELFIES
         for i in range(0,len(dic)):
             self.vocab_stoi[(dic[i].strip())] = i
             self.vocab_itos[i] = (dic[i].strip())
+        print("vocab_itos", self.vocab_itos)
 
     def __getitem__(self, i): # we need to include 'GO' and 'EOS'
         mol = self.smiles[i]
         # can we tokenize the special characters alone?
-        # tokenized = self.voc.tokenize(mol)
-        # encoded = self.voc.encode(tokenized)
+        tokenized = self.voc.tokenize(mol)
+        encoded = self.voc.encode(tokenized)
         # vocab_stoi = {}
         # with open("data/Voc_danish", 'r')as f:
         #     dic = f.readlines()
         # for i in range(0,len(dic)):
         #     vocab_stoi[(dic[i].strip())] = i
         pad_to_len = selfies.len_selfies(mol)
+        print("encoded", encoded)
         
         # encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
-        encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
-        encoded = np.array(encoded, dtype=float)
-        if encoded is not None:
-            return Variable(encoded)
+        all_encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
+        all_encoded = np.array(all_encoded, dtype=float)
+        if all_encoded is not None:
+            return Variable(all_encoded)
 
     def __len__(self):
         return len(self.smiles)

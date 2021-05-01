@@ -51,6 +51,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
 
     """
     voc = Vocabulary(init_from_file=voc_dir)
+    print("voc", voc)
     #cano_smi_file('all_smi_refined.csv', 'all_smi_refined_cano.csv') # writes to a file
     # cano_smi_file('data/refined_smi_test.csv', 'all_smi_refined_cano.csv')
     moldata = MolData(smi_dir, voc)
@@ -107,7 +108,9 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
         #valid_smis = []
         print("HERE")
         for i, seq in enumerate(seqs.cpu().numpy()):
+            print("seq", seq)
             smile = voc.decode(seq)
+            print("smile", smile)
             if Chem.MolFromSmiles(smile):
                 try:
                     AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
