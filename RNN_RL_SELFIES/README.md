@@ -21,8 +21,6 @@ First, we must translate our SMILES strings into SELFIES strings and generate a 
 ```
 python data_structs.py mols.smi Voc_danish danish.smi 
 ```
-
-where
 - `mols.smi` - the SMILES file on which you want to train
 - `Voc_danish` - the SELFIES file we are writing the vocabulary to (this will be placed in the data folder)
 - `danish.smi` - the SELFIES file to which we are writing the translated strings (this will be a file containing all the same molecules as mols.smi but translated into SELFIES strings and will be placed in the data folder)
@@ -32,12 +30,13 @@ Next, we want to train our Prior model and save it in our data folder. To do thi
 ```
 python train_prior.py data/Voc_danish data/SELFIES_danish.smi
 ```
-
-where
 - `data/Voc_danish` - the vocabulary we created from running data_structs.py as above
 - `data/SELFIES_danish.smi` - the SELFIES file we created from running data_structs.py as above
 
-To do transfer learning on a target dataset, use transfer_userinpt.py.
+To do transfer learning on a target dataset, use:
+```
+transfer_userinpt.py.
+```
 
 
 
