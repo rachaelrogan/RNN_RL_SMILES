@@ -34,7 +34,7 @@ class Vocabulary(object):
 
         return smiles_matrix
 
-    def decode(self, matrix): ### change to SELFIES
+    def decode(self, matrix):
         """Takes an array of indices and returns the corresponding SMILES"""
         chars = []
         for i in matrix:
@@ -44,18 +44,9 @@ class Vocabulary(object):
         smiles = smiles.replace("L", "Cl").replace("R", "Br")
         return smiles
 
-    def tokenize(self, smiles): ### change to SELFIES
+    def tokenize(self, smiles):
         """Takes a SMILES and return a list of characters/tokens"""
-        # regex = '(\[[^\[\]]{1,6}\])'
-        # # smiles = replace_halogen(smiles)
-        # char_list = re.split(regex, smiles)
         tokenized = []
-        # for char in char_list:
-        #     if char.startswith('['):
-        #         tokenized.append(char)
-        #     else:
-        #         chars = [unit for unit in char]
-        #         [tokenized.append(unit) for unit in chars]
         tokenized.append('EOS')
         tokenized.append('GO')
         return tokenized
@@ -106,22 +97,12 @@ class MolData(Dataset): ### change to SELFIES
         for i in range(0,len(dic)):
             self.vocab_stoi[(dic[i].strip())] = i
             self.vocab_itos[i] = (dic[i].strip())
-        print("vocab_itos", self.vocab_itos)
 
-    def __getitem__(self, i): # we need to include 'GO' and 'EOS'
+    def __getitem__(self, i):
         mol = self.smiles[i]
-        # can we tokenize the special characters alone?
         tokenized = self.voc.tokenize(mol)
         encoded = self.voc.encode(tokenized)
-        # vocab_stoi = {}
-        # with open("data/Voc_danish", 'r')as f:
-        #     dic = f.readlines()
-        # for i in range(0,len(dic)):
-        #     vocab_stoi[(dic[i].strip())] = i
         pad_to_len = selfies.len_selfies(mol)
-        print("encoded", encoded)
-        
-        # encoded = selfies.selfies_to_encoding(mol, vocab_stoi=vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
         all_encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
         all_encoded = np.array(all_encoded, dtype=float)
         if all_encoded is not None:
@@ -152,7 +133,7 @@ def replace_halogen(string):
 
     return string
 
-def tokenize(smiles): ### change to SELFIES
+def tokenize(smiles):
     """Takes a SMILES string and returns a list of tokens.
     This will swap 'Cl' and 'Br' to 'L' and 'R' and treat
     '[xx]' as one token."""
@@ -169,40 +150,15 @@ def tokenize(smiles): ### change to SELFIES
     tokenized.append('EOS')
     return tokenized
 
-def canonicalize_smiles_from_file(fname): ### change to SELFIES
-    # """Reads a SMILES file and returns a list of RDKIT SMILES"""
-    # with open(fname, 'r') as f:
-    #     smiles_list = []
-    #     for i, line in enumerate(f):
-    #         #print("i: ", i)
-    #         if i % 100000 == 0:
-    #             print("{} lines processed.".format(i))
-    #         smiles = line.split(" ")[0]
-    #         mol = Chem.MolFromSmiles(smiles)
-    #         if filter_mol(mol):
-    #             smiles_list.append(Chem.MolToSmiles(mol))
-    #     print("{} SMILES retrieved".format(len(smiles_list)))
-    #     #print("smiles_list: ", smiles_list)
-    #     return smiles_list
+def canonicalize_smiles_from_file(fname):
     """Reads a SMILES file and returns a list of SELFIES strings"""
-    # encoder returning None: https://selfies-mirror.readthedocs.io/en/latest/selfies.html
-    # Either the molecules we are dealing with are not able to be changed to SELFIES at all, 
-    # or we must change the semantic constraints of selfies? (This didn't work based on how
-    # I implemented it.)
     with open(fname, 'r') as f:
         selfies_list = []
-        # default_constraints = selfies.get_semantic_constraints()
-        # new_constraints = default_constraints
-        # new_constraints['O'] = 4
-        # new_constraints['C'] = 8
-        # selfies.set_semantic_constraints(new_constraints)  # update constraints
-        # print("constraints: ", selfies.get_semantic_constraints())
         for i, line in enumerate(f):
             smiles = line.split(" ")[0]
             mol = Chem.MolFromSmiles(smiles)
             if filter_mol(mol):  
                 encoded = convert(smiles)
-                # print("encoded: ", encoded)
                 selfies_list.append(encoded)
         print("{} SMILES retrieved".format(len(selfies_list)))
         return selfies_list
@@ -214,19 +170,18 @@ def filter_mol(mol, max_heavy_atoms=50, min_heavy_atoms=10, element_list=[6,7,8,
     if mol is not None:
         num_heavy = min_heavy_atoms<mol.GetNumHeavyAtoms()<max_heavy_atoms
         elements = all([atom.GetAtomicNum() in element_list for atom in mol.GetAtoms()])
-        #if num_heavy and elements: remove the limit of elementlist for donor-acceptors
         if num_heavy:
             return True
         else:
             return False
 
-def write_smiles_to_file(smiles_list, fname): ### convert from SELFIES to SMILES first
+def write_smiles_to_file(smiles_list, fname):
     """Write a list of SMILES to a file."""
     with open(fname, 'w') as f:
         for smiles in smiles_list:
             f.write(smiles + "\n")
 
-def filter_on_chars(smiles_list, chars): ### change to SELFIES = ?
+def filter_on_chars(smiles_list, chars):
     """Filters SMILES on the characters they contain.
        Used to remove SMILES containing very rare/undesirable
        characters."""
@@ -237,7 +192,7 @@ def filter_on_chars(smiles_list, chars): ### change to SELFIES = ?
             smiles_list_valid.append(smiles)
     return smiles_list_valid
 
-def filter_file_on_chars(smiles_fname, voc_fname): ### change to SELFIES
+def filter_file_on_chars(smiles_fname, voc_fname):
     """Filters a SMILES file using a vocabulary file.
        Only SMILES containing nothing but the characters
        in the vocabulary will be retained."""
@@ -265,25 +220,11 @@ def combine_voc_from_files(fnames):
         for char in chars:
             f.write(char + "\n")
 
-def construct_vocabulary(selfies_list, fname): ### change to SELFIES
+def construct_vocabulary(selfies_list, fname):
     """Returns all the characters present in a SMILES file.
        Uses regex to find characters/tokens of the format '[x]'."""
-    # add_chars = set()
-    # for i, smiles in enumerate(smiles_list):
-    #     regex = '(\[[^\[\]]{1,6}\])'
-    #     smiles = replace_halogen(smiles)
-    #     char_list = re.split(regex, smiles)
-    #     for char in char_list:
-    #         if char.startswith('['):
-    #             add_chars.add(char)
-    #         else:
-    #             chars = [unit for unit in char]
-    #             [add_chars.add(unit) for unit in chars]
-
-    # add_chars = []
     add_chars = set()
     for selfie in selfies_list:
-        # add_chars.append(selfies.get_alphabet_from_selfies(selfie))
         symbols = selfies.split_selfies(selfie)
         for symbol in symbols:
             add_chars.add(symbol)
@@ -346,17 +287,12 @@ def write_selfies_to_file(file, selfies_strings):
                 f.write(str(i) + "\n")
 
 if __name__ == "__main__":
-    smiles_file = sys.argv[1] # the SMILES file we are translating from   mols.smi
-    selfies_vocab_file = sys.argv[2] # the SELFIES file we are writing the vocabulary to   ./data/Voc_danish
-    empty_selfies_file = sys.argv[3] # ./data/danish.smi
+    smiles_file = sys.argv[1] 
+    selfies_vocab_file = sys.argv[2]
+    empty_selfies_file = sys.argv[3]
     selfies_vocab_file = 'data/' + selfies_vocab_file
     print("Reading smiles...")
     selfies_list = canonicalize_smiles_from_file(smiles_file)
-    # print("selfies_list", selfies_list)
     print("Constructing vocabulary...")
     voc_chars = construct_vocabulary(selfies_list, selfies_vocab_file)
     write_selfies_to_file(empty_selfies_file, selfies_list)
-    # write_smiles_to_file(selfies_list, "data/danish.smi")
-
-
-# python data_structs.py mols.smi Voc_danish danish.smi

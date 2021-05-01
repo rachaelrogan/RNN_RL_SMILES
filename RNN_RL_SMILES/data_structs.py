@@ -151,7 +151,6 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
     with open(fname, 'r') as f:
         smiles_list = []
         for i, line in enumerate(f):
-            #print("i: ", i)
             if i % 100000 == 0:
                 print("{} lines processed.".format(i))
             smiles = line.split(" ")[0]
@@ -159,7 +158,6 @@ def canonicalize_smiles_from_file(fname): ### change to SELFIES
             if filter_mol(mol):
                 smiles_list.append(Chem.MolToSmiles(mol))
         print("{} SMILES retrieved".format(len(smiles_list)))
-        #print("smiles_list: ", smiles_list)
         return smiles_list
 
 def filter_mol(mol, max_heavy_atoms=50, min_heavy_atoms=10, element_list=[6,7,8,9,16,17,35,33,51]):
@@ -198,12 +196,10 @@ def filter_file_on_chars(smiles_fname, voc_fname): ### change to SELFIES
     with open(smiles_fname, 'r') as f:
         for line in f:
             smiles.append(line.split()[0])
-    print(smiles[:10])
     chars = []
     with open(voc_fname, 'r') as f:
         for line in f:
             chars.append(line.split()[0])
-    print(chars)
     valid_smiles = filter_on_chars(smiles, chars)
     with open(smiles_fname + "_filtered", 'w') as f:
         for smiles in valid_smiles:

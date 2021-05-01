@@ -52,17 +52,10 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
 
     """
     voc = Vocabulary(init_from_file=voc_dir)
-    #cano_smi_file('all_smi_refined.csv', 'all_smi_refined_cano.csv') # writes to a file
-    # cano_selfies_file('data/refined_selfies_test.csv', 'all_selfies_refined_cano.csv')
     moldata = MolData(smi_dir, voc)
-    # Monomers 67 and 180 were removed because of the unseen [C-] in voc
-    # DAs containing [C] removed: 43 molecules in 5356; Ge removed: 154 in 5356; [c] removed 4 in 5356
-    # [S] 1 molecule in 5356
     data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=False,
                       collate_fn=MolData.collate_fn)
-    print("inside train_model voc.vocab_size: ", voc.vocab_size)
     transfer_model = RNN(voc)
-    # if freeze=True, freeze all parameters except those in the linear layer
     if freeze:
         for param in transfer_model.rnn.parameters():
             param.requires_grad = False
@@ -88,42 +81,16 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
             if step % 80 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
-                # tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data[0]))
                 tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data.item()))
-                # seqs, likelihood, _ = transfer_model.sample(128)
-                # valid = 0
-                # for i, seq in enumerate(seqs.cpu().numpy()):
-                #     smile = voc.decode(seq)
-                #     if Chem.MolFromSmiles(smile):
-                #         valid += 1
-                #     if i < 5:
-                #         tqdm.write(smile)
-                # tqdm.write("\n{:>4.1f}% valid SMILES".format(100*valid/len(seqs)))
                 tqdm.write("*"*50 + '\n')
                 torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
         valid = 0
-        #valid_smis = []
-        # for i, seq in enumerate(seqs.cpu().numpy()):
-        #     smile = voc.decode(seq)
-        #     if Chem.MolFromSmiles(smile):
-        #         try:
-        #             AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
-        #             valid += 1
-        #             smi_lst.append(smile)
-        #             epoch_lst.append(epoch)
-        #         except:
-        #             continue
         for i, seq in enumerate(seqs.cpu().numpy()):
-            # print("seq", seq)
             for a in range(seq.size):
-                # print("a", a)
-                # print("seq[seq.size-1]", seq[seq.size-1])
                 if seq[a] == 18 or seq[a]==19 or a == seq.size-1:
-                    # print("seq[:a]", seq[:a])
                     selfie = selfies.encoding_to_selfies(seq[:a], vocab_itos=moldata.vocab_itos, enc_type="label")
-                    # selfie = selfies.encoding_to_selfies(seq,)
-                    smile = selfies.decoder(selfie) # convert to SMILES so we can get the Morgan Fingerprint
+                    smile = selfies.decoder(selfie) 
                     if Chem.MolFromSmiles(smile):
                         try:
                             AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
@@ -173,9 +140,6 @@ def sample_smiles(voc_dir, nums, outfn,tf_dir, until=False):
                     output.write(smile+'\n')
                 except:
                     continue
-            #if smile.count('Br') == 2:
-            #    double_br += 1
-            #output.write(smile+'\n')
         tqdm.write('\n{} molecules sampled, {} valid SMILES, {} with double Br'.format(nums, valid, double_br))
         output.close()
     else:
@@ -186,15 +150,12 @@ def sample_smiles(voc_dir, nums, outfn,tf_dir, until=False):
             n_sample += 1
             seq = seq.cpu().numpy()
             seq = seq[0]
-            # print(seq)
             smile = voc.decode(seq)
             if Chem.MolFromSmiles(smile):
                 try:
                     AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smile), 2, 1024)
                     valid += 1
                     output.write(smile + '\n')
-                    #if valid % 100 == 0 and valid != 0:
-                    #    tqdm.write('\n{} valid molecules sampled, with {} of total samples'.format(valid, n_sample))
                 except:
                     continue
         tqdm.write('\n{} valid molecules sampled, with {} of total samples'.format(nums, n_sample))
@@ -207,15 +168,10 @@ if __name__ == "__main__":
                         default='train_model',help='What task to perform')
     parser.add_argument('--voc', action='store', dest='voc_dir',
                         default='data/Voc_danish', help='Directory for the vocabulary')
-                        # default='data/Voc_withda', help='Directory for the vocabulary')
-    # parser.add_argument('--smi', action='store', dest='smi_dir', default='cano_acceptors_smi.csv',
-    # parser.add_argument('--smi', action='store', dest='smi_dir', default='deepsmile_test/monomer_db.csv',
     parser.add_argument('--smi', action='store', dest='smi_dir', default='data\SELFIES_danish.smi',
                         help='Directory of the SMILES file for tranfer learning')
-    # parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_gua_withda.ckpt',
     parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_local.ckpt',
                         help='Directory of the prior trained RNN')
-    # parser.add_argument('--tf_model',action='store', dest='tf_dir', default='data/tf_model_acceptor_smi_tuneall2.ckpt',
     parser.add_argument('--tf_model',action='store', dest='tf_dir', default='data/Prior_local.ckpt',
                         help='Directory of the transfer model')
     parser.add_argument('--nums', action='store', dest='nums', default='1024',
@@ -225,9 +181,7 @@ if __name__ == "__main__":
     parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='Model1_sample_process.csv',
                         help='Directory to save the generated SMILES')
     arg_dict = vars(parser.parse_args())
-    print(arg_dict)
     task_, voc_, smi_, prior_, tf_, nums_, save_smi_, tf_process_dir_ = arg_dict.values()
-    print("voc_: ", voc_)
 
     if task_ == 'train_model':
         train_model(voc_dir=voc_, smi_dir=smi_, prior_dir=prior_, tf_dir=tf_,
