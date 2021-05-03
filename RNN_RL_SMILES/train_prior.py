@@ -22,7 +22,7 @@ def pretrain(restore_from=None):
     # Create a Dataset from a SMILES file
     # moldata = MolData("data/ChEMBL_filtered", voc)
     moldata = MolData("data/danish.smi", voc)
-    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=True,
+    data = DataLoader(moldata, batch_size=10, shuffle=True, drop_last=True,
                      collate_fn=MolData.collate_fn)
     print("in pretrain(), voc: ", voc)
     Prior = RNN(voc)
@@ -55,7 +55,7 @@ def pretrain(restore_from=None):
             optimizer.step()
 
             # Every 500 steps we decrease learning rate and print some information
-            if step % 10 == 0 and step != 0:
+            if step % 100 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
                 # print("loss.data.item()", loss.data.item())

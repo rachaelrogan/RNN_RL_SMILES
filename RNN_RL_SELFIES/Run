@@ -1,0 +1,15 @@
+(research) PS C:\Users\Rachael Rogan\Desktop\Capstone\Research\Master Code\RNN_RL_SMILES\RNN_RL_SELFIES> python limiter.py Training_Database.smiles
+(research) PS C:\Users\Rachael Rogan\Desktop\Capstone\Research\Master Code\RNN_RL_SMILES\RNN_RL_SELFIES> python .\LimitMatch.py
+(research) PS C:\Users\Rachael Rogan\Desktop\Capstone\Research\Master Code\RNN_RL_SMILES\RNN_RL_SELFIES> python .\data_structs.py LIMITED_Training_Database.smiles Voc_danish danish.smi 
+(research) PS C:\Users\Rachael Rogan\Desktop\Capstone\Research\Master Code\RNN_RL_SMILES\RNN_RL_SELFIES> python train_prior.py data/Voc_danish data/SELFIES_danish.smi
+(research) PS C:\Users\Rachael Rogan\Desktop\Capstone\Research\Master Code\RNN_RL_SMILES\RNN_RL_SELFIES> python .\transfer_userinpt.py
+490/490 [13:17<00:00,  1.63s/it]
+490/490 [13:11<00:00,  1.62s/it]
+490/490 [12:54<00:00,  1.58s/it]
+490/490 [13:00<00:00,  1.59s/it]
+490/490 [12:53<00:00,  1.58s/it] 
+490/490 [13:35<00:00,  1.67s/it]
+490/490 [13:21<00:00,  1.63s/it] 
+490/490 [13:29<00:00,  1.65s/it]
+490/490 [13:41<00:00,  1.68s/it]
+490/490 [13:25<00:00,  1.64s/it] 

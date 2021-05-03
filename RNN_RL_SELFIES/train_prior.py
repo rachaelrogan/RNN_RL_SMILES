@@ -16,7 +16,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
     "Train the Prior RNN"
     voc = Vocabulary(init_from_file=vocab_file)
     moldata = MolData(data_file, voc)
-    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=True,
+    data = DataLoader(moldata, batch_size=10, shuffle=True, drop_last=True,
                      collate_fn=MolData.collate_fn)
     Prior = RNN(voc)
     if restore_from:
@@ -44,7 +44,7 @@ def pretrain(vocab_file, data_file, restore_from=None):
             optimizer.step()
 
             # Every 500 steps we decrease learning rate and print some information
-            if step % 10 == 0 and step != 0:
+            if step % 100 == 0 and step != 0:
                 decrease_learning_rate(optimizer, decrease_by=0.03)
                 tqdm.write('*'*50)
                 tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data.item()))

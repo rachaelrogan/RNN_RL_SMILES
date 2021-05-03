@@ -53,7 +53,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
     """
     voc = Vocabulary(init_from_file=voc_dir)
     moldata = MolData(smi_dir, voc)
-    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=False,
+    data = DataLoader(moldata, batch_size=10, shuffle=True, drop_last=False,
                       collate_fn=MolData.collate_fn)
     transfer_model = RNN(voc)
     if freeze:
@@ -88,7 +88,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
         valid = 0
         for i, seq in enumerate(seqs.cpu().numpy()):
             for a in range(seq.size):
-                if seq[a] == 18 or seq[a]==19 or a == seq.size-1:
+                if seq[a] == 46 or seq[a]== 45 or a == seq.size-1:
                     selfie = selfies.encoding_to_selfies(seq[:a], vocab_itos=moldata.vocab_itos, enc_type="label")
                     smile = selfies.decoder(selfie) 
                     if Chem.MolFromSmiles(smile):
@@ -176,9 +176,9 @@ if __name__ == "__main__":
                         help='Directory of the transfer model')
     parser.add_argument('--nums', action='store', dest='nums', default='1024',
                         help='Number of SMILES to sample for transfer learning')
-    parser.add_argument('--save_smi',action='store',dest='save_dir',default='acceptor_1024_tuneall2.csv',
+    parser.add_argument('--save_smi',action='store',dest='save_dir',default='SELFIES_transfer_save_smi.csv',
                         help='Directory to save the generated SMILES')
-    parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='Model1_sample_process.csv',
+    parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='SELFIES_transfer_process_smi.csv',
                         help='Directory to save the generated SMILES')
     arg_dict = vars(parser.parse_args())
     task_, voc_, smi_, prior_, tf_, nums_, save_smi_, tf_process_dir_ = arg_dict.values()
