@@ -71,6 +71,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
     smi_lst = []; epoch_lst = []
     for epoch in range(1, 11):
 
+        # SELFIES RUN ISSUE 1: This was the beginning of the problem, when we were pulling from data
         for step, batch in tqdm(enumerate(data), total=len(data)):
             seqs = batch.long()
             if len(seqs.tolist()) != 0:
@@ -90,7 +91,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
         valid = 0
         for i, seq in enumerate(seqs.cpu().numpy()):
             for a in range(seq.size):
-                if seq[a] == 46 or seq[a]== 45 or a == seq.size-1:
+                if seq[a] == 46 or seq[a]== 45 or a == seq.size-1: # I had to change this to 46 and 45 because the vocab size is different than from mol.smi (these are, I think, GO and EOS)
                     selfie = selfies.encoding_to_selfies(seq[:a], vocab_itos=moldata.vocab_itos, enc_type="label")
                     smile = selfies.decoder(selfie) 
                     if Chem.MolFromSmiles(smile):
