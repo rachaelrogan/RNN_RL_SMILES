@@ -58,7 +58,7 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
     # Monomers 67 and 180 were removed because of the unseen [C-] in voc
     # DAs containing [C] removed: 43 molecules in 5356; Ge removed: 154 in 5356; [c] removed 4 in 5356
     # [S] 1 molecule in 5356
-    data = DataLoader(moldata, batch_size=1, shuffle=True, drop_last=False,
+    data = DataLoader(moldata, batch_size=10, shuffle=True, drop_last=False,
                       collate_fn=MolData.collate_fn)
     print("inside train_model voc.vocab_size: ", voc.vocab_size)
     transfer_model = RNN(voc)
@@ -103,10 +103,10 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
                 tqdm.write("*"*50 + '\n')
                 torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
-        print("here9")
+        # print("here9")
         valid = 0
         #valid_smis = []
-        print("HERE")
+        # print("HERE")
         for i, seq in enumerate(seqs.cpu().numpy()):
             print("seq", seq)
             smile = voc.decode(seq)
@@ -166,7 +166,7 @@ def sample_smiles(voc_dir, nums, outfn,tf_dir, until=False):
         tqdm.write('\n{} molecules sampled, {} valid SMILES, {} with double Br'.format(nums, valid, double_br))
         output.close()
     else:
-        valid = 0;
+        valid = 0
         n_sample = 0
         while valid < nums:
             seq, likelihood, _ = transfer_model.sample(1)
@@ -197,7 +197,7 @@ if __name__ == "__main__":
                         # default='data/Voc_withda', help='Directory for the vocabulary')
     # parser.add_argument('--smi', action='store', dest='smi_dir', default='cano_acceptors_smi.csv',
     # parser.add_argument('--smi', action='store', dest='smi_dir', default='deepsmile_test/monomer_db.csv',
-    parser.add_argument('--smi', action='store', dest='smi_dir', default='mols.smi',
+    parser.add_argument('--smi', action='store', dest='smi_dir', default='LIMITED_Transfure_Database.csv',
                         help='Directory of the SMILES file for tranfer learning')
     # parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_gua_withda.ckpt',
     parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_local.ckpt',
@@ -207,9 +207,9 @@ if __name__ == "__main__":
                         help='Directory of the transfer model')
     parser.add_argument('--nums', action='store', dest='nums', default='1024',
                         help='Number of SMILES to sample for transfer learning')
-    parser.add_argument('--save_smi',action='store',dest='save_dir',default='acceptor_1024_tuneall2.csv',
+    parser.add_argument('--save_smi',action='store',dest='save_dir',default='SMILES_save_smi.csv',
                         help='Directory to save the generated SMILES')
-    parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='Model1_sample_process.csv',
+    parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='SMILES_transfer_process_smi.csv',
                         help='Directory to save the generated SMILES')
     arg_dict = vars(parser.parse_args())
     print(arg_dict)

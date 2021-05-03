@@ -17,7 +17,7 @@ def pretrain(restore_from=None):
 
     # Reads vocabulary from a file
     # voc = Vocabulary(init_from_file="data/Voc")
-    voc = Vocabulary(init_from_file="mols.smi")
+    voc = Vocabulary(init_from_file="data/Voc_danish")
 
     # Create a Dataset from a SMILES file
     # moldata = MolData("data/ChEMBL_filtered", voc)
@@ -38,10 +38,8 @@ def pretrain(restore_from=None):
         # in a few of epochs or even faster. If model sized is increased
         # its probably a good idea to check loss against an external set of
         # validation SMILES to make sure we dont overfit too much.
-        print("len(data)", len(data))
-        print("data", data)
+        
         for step, batch in tqdm(enumerate(data), total=len(data)):
-            print("IN LOOP")
             # Sample from Dataloader
             seqs = batch.long()
 
