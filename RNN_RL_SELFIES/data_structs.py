@@ -74,7 +74,7 @@ class Vocabulary(object):
     def __str__(self):
         return "Vocabulary containing {} tokens: {}".format(len(self), self.chars)
 
-class MolData(Dataset): ### change to SELFIES
+class MolData(Dataset):
     """Custom PyTorch Dataset that takes a file containing SMILES.
 
         Args:
