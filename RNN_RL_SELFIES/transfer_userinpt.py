@@ -60,11 +60,11 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
         for param in transfer_model.rnn.parameters():
             param.requires_grad = False
         transfer_model.rnn.linear = nn.Linear(512, voc.vocab_size)
-    if torch.cuda.is_available():
-        transfer_model.rnn.load_state_dict(torch.load(prior_dir))
-    else:
-        transfer_model.rnn.load_state_dict(torch.load(prior_dir,
-                                                      map_location=lambda storage, loc: storage))
+    # if torch.cuda.is_available():
+    #     transfer_model.rnn.load_state_dict(torch.load(prior_dir))
+    # else:
+    transfer_model.rnn.load_state_dict(torch.load(prior_dir,
+                                                    map_location=lambda storage, loc: storage))
 
     optimizer = torch.optim.Adam(transfer_model.rnn.parameters(), lr=0.0005)
 
@@ -73,17 +73,19 @@ def train_model(voc_dir, smi_dir, prior_dir, tf_dir,tf_process_dir,freeze=False)
 
         for step, batch in tqdm(enumerate(data), total=len(data)):
             seqs = batch.long()
-            log_p, _ = transfer_model.likelihood(seqs)
-            loss = -log_p.mean()
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            if step % 80 == 0 and step != 0:
-                decrease_learning_rate(optimizer, decrease_by=0.03)
-                tqdm.write('*'*50)
-                tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data.item()))
-                tqdm.write("*"*50 + '\n')
-                torch.save(transfer_model.rnn.state_dict(), tf_dir)
+            if len(seqs.tolist()) != 0:
+                
+                log_p, _ = transfer_model.likelihood(seqs)
+                loss = -log_p.mean()
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                if step % 80 == 0 and step != 0:
+                    decrease_learning_rate(optimizer, decrease_by=0.03)
+                    tqdm.write('*'*50)
+                    tqdm.write("Epoch {:3d}   step {:3d}    loss: {:5.2f}\n".format(epoch, step, loss.data.item()))
+                    tqdm.write("*"*50 + '\n')
+                    torch.save(transfer_model.rnn.state_dict(), tf_dir)
         seqs, likelihood, _ = transfer_model.sample(1024)
         valid = 0
         for i, seq in enumerate(seqs.cpu().numpy()):
@@ -115,11 +117,11 @@ def sample_smiles(voc_dir, nums, outfn,tf_dir, until=False):
     transfer_model = RNN(voc)
     output = open(outfn, 'w')
 
-    if torch.cuda.is_available():
-        transfer_model.rnn.load_state_dict(torch.load(tf_dir))
-    else:
-        transfer_model.rnn.load_state_dict(torch.load(tf_dir,
-                                                    map_location=lambda storage, loc:storage))
+    # if torch.cuda.is_available():
+    #     transfer_model.rnn.load_state_dict(torch.load(tf_dir))
+    # else:
+    transfer_model.rnn.load_state_dict(torch.load(tf_dir,
+                                                map_location=lambda storage, loc:storage))
     for param in transfer_model.rnn.parameters():
         param.requires_grad = False
 
@@ -168,7 +170,7 @@ if __name__ == "__main__":
                         default='train_model',help='What task to perform')
     parser.add_argument('--voc', action='store', dest='voc_dir',
                         default='data/Voc_danish', help='Directory for the vocabulary')
-    parser.add_argument('--smi', action='store', dest='smi_dir', default='data\SELFIES_danish.smi',
+    parser.add_argument('--smi', action='store', dest='smi_dir', default='LIMITED_Transfure_Database.csv',
                         help='Directory of the SMILES file for tranfer learning')
     parser.add_argument('--prior_model', action='store', dest='prior_dir', default='data/Prior_local.ckpt',
                         help='Directory of the prior trained RNN')
@@ -178,7 +180,7 @@ if __name__ == "__main__":
                         help='Number of SMILES to sample for transfer learning')
     parser.add_argument('--save_smi',action='store',dest='save_dir',default='SELFIES_transfer_save_smi.csv',
                         help='Directory to save the generated SMILES')
-    parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='SELFIES_transfer_process_smi.csv',
+    parser.add_argument('--save_process_smi',action='store',dest='tf_process_dir',default='SELFIES_transfer_process_smi_transfer_Database.csv',
                         help='Directory to save the generated SMILES')
     arg_dict = vars(parser.parse_args())
     task_, voc_, smi_, prior_, tf_, nums_, save_smi_, tf_process_dir_ = arg_dict.values()

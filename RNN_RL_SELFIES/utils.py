@@ -14,8 +14,8 @@ def Variable(tensor):
     if isinstance(tensor, np.ndarray):
         tensor = torch.from_numpy(tensor)
         tensor.requires_grad = True
-    if torch.cuda.is_available():
-        tensor = tensor.cuda()
+    # if torch.cuda.is_available():
+    #     tensor = tensor.cuda()
     return tensor 
 
 
@@ -77,6 +77,6 @@ def unique(arr):
     arr = arr.cpu().numpy()
     arr_ = np.ascontiguousarray(arr).view(np.dtype((np.void, arr.dtype.itemsize*arr.shape[1])))
     _, idxs = np.unique(arr_, return_index=True)
-    if torch.cuda.is_available():
-        return torch.LongTensor(np.sort(idxs)).cuda()
+    # if torch.cuda.is_available():
+    #     return torch.LongTensor(np.sort(idxs)).cuda()
     return torch.LongTensor(np.sort(idxs))

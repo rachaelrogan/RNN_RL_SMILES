@@ -34,12 +34,12 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     # By default restore Agent to same model as Prior, but can restore from already trained Agent too.
     # Saved models are partially on the GPU, but if we dont have cuda enabled we can remap these
     # to the CPU.
-    if torch.cuda.is_available():
-        Prior.rnn.load_state_dict(torch.load('data/Prior.ckpt'))
-        Agent.rnn.load_state_dict(torch.load(restore_agent_from))
-    else:
-        Prior.rnn.load_state_dict(torch.load('data/Prior.ckpt', map_location=lambda storage, loc: storage))
-        Agent.rnn.load_state_dict(torch.load(restore_agent_from, map_location=lambda storage, loc: storage))
+    # if torch.cuda.is_available():
+    #     Prior.rnn.load_state_dict(torch.load('data/Prior.ckpt'))
+    #     Agent.rnn.load_state_dict(torch.load(restore_agent_from))
+    # else:
+    Prior.rnn.load_state_dict(torch.load('data/Prior.ckpt', map_location=lambda storage, loc: storage))
+    Agent.rnn.load_state_dict(torch.load(restore_agent_from, map_location=lambda storage, loc: storage))
 
     # We dont need gradients with respect to Prior
     for param in Prior.rnn.parameters():

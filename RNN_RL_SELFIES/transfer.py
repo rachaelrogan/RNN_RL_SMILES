@@ -33,14 +33,14 @@ def train_model():
     moldata = MolData('refined_smii_cano.csv', voc)
     # Monomers 67 and 180 were removed because of the unseen [C-] in voc
     # DAs containing [se] [SiH2] [n] removed: 38 molecules
-    data = DataLoader(moldata, batch_size=64, shuffle=True, drop_last=False,
+    data = DataLoader(moldata, batch_size=10, shuffle=True, drop_last=False,
                       collate_fn=MolData.collate_fn)
     transfer_model = RNN(voc)
 
-    if torch.cuda.is_available():
-        transfer_model.rnn.load_state_dict(torch.load('data/Prior.ckpt'))
-    else:
-        transfer_model.rnn.load_state_dict(torch.load('data/Prior.ckpt', map_location=lambda storage, loc: storage))
+    # if torch.cuda.is_available():
+    #     transfer_model.rnn.load_state_dict(torch.load('data/Prior.ckpt'))
+    # else:
+    transfer_model.rnn.load_state_dict(torch.load('data/Prior.ckpt', map_location=lambda storage, loc: storage))
 
     # for param in transfer_model.rnn.parameters():
     #     param.requires_grad = False
@@ -82,11 +82,11 @@ def sample_smiles(nums, outfn, until=False):
     transfer_model = RNN(voc)
     output = open(outfn, 'w')
 
-    if torch.cuda.is_available():
-        transfer_model.rnn.load_state_dict(torch.load('data/tf_model_da_cluster_with_script2.ckpt'))
-    else:
-        transfer_model.rnn.load_state_dict(torch.load('data/tf_model_da_cluster_with_script2.ckpt',
-                                                    map_location=lambda storage, loc:storage))
+    # if torch.cuda.is_available():
+    #     transfer_model.rnn.load_state_dict(torch.load('data/tf_model_da_cluster_with_script2.ckpt'))
+    # else:
+    transfer_model.rnn.load_state_dict(torch.load('data/tf_model_da_cluster_with_script2.ckpt',
+                                                map_location=lambda storage, loc:storage))
 
     for param in transfer_model.rnn.parameters():
         param.requires_grad = False

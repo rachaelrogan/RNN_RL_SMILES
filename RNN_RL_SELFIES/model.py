@@ -41,8 +41,8 @@ class RNN():
     def __init__(self, voc):
         self.rnn = MultiGRU(voc.vocab_size)
         self.voc_size = voc.vocab_size
-        if torch.cuda.is_available():
-            self.rnn.cuda()
+        # if torch.cuda.is_available():
+        #     self.rnn.cuda()
         self.voc = voc
 
     def likelihood(self, target):
@@ -115,8 +115,8 @@ class RNN():
         log_probs = Variable(torch.zeros(batch_size))
         finished = torch.zeros(batch_size).byte()
         entropy = Variable(torch.zeros(batch_size))
-        if torch.cuda.is_available():
-            finished = finished.cuda()
+        # if torch.cuda.is_available():
+        #     finished = finished.cuda()
 
         for step in range(max_length):
             
@@ -149,10 +149,10 @@ def NLLLoss(inputs, targets):
             loss : (batch_size) *Loss for each example*
     """
 
-    if torch.cuda.is_available():
-        target_expanded = torch.zeros(inputs.size()).cuda()
-    else:
-        target_expanded = torch.zeros(inputs.size())
+    # if torch.cuda.is_available():
+    #     target_expanded = torch.zeros(inputs.size()).cuda()
+    # else:
+    target_expanded = torch.zeros(inputs.size())
 
     target_expanded.scatter_(1, targets.contiguous().view(-1, 1).data, 1.0)
     loss = Variable(target_expanded) * inputs

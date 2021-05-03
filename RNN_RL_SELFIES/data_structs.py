@@ -103,8 +103,11 @@ class MolData(Dataset): ### change to SELFIES
         tokenized = self.voc.tokenize(mol)
         encoded = self.voc.encode(tokenized)
         pad_to_len = selfies.len_selfies(mol)
-        all_encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
-        all_encoded = np.array(all_encoded, dtype=float)
+        try:
+            all_encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
+            all_encoded = np.array(all_encoded, dtype=float)
+        except:
+            all_encoded = np.array([], dtype=float)
         if all_encoded is not None:
             return Variable(all_encoded)
 
@@ -117,10 +120,14 @@ class MolData(Dataset): ### change to SELFIES
     @classmethod
     def collate_fn(cls, arr):
         """Function to take a list of encoded sequences and turn them into a batch"""
-        max_length = max([seq.size(0) for seq in arr])
-        collated_arr = Variable(torch.zeros(len(arr), max_length))
-        for i, seq in enumerate(arr):
-            collated_arr[i, :seq.size(0)] = seq
+        max_length = max([seq.size(0) for seq in arr]) 
+        if max_length == 0:
+            collated_arr = Variable(torch.zeros(0, 0))
+        else:
+            max_length = max([seq.size(0) for seq in arr]) 
+            collated_arr = Variable(torch.zeros(len(arr), max_length))
+            for i, seq in enumerate(arr):
+                collated_arr[i, :seq.size(0)] = seq
         return collated_arr
 
 
