@@ -103,8 +103,13 @@ class MolData(Dataset): ### change to SELFIES
         tokenized = self.voc.tokenize(mol)
         encoded = self.voc.encode(tokenized)
         pad_to_len = selfies.len_selfies(mol)
-        all_encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
-        all_encoded = np.array(all_encoded, dtype=float)
+        # SELFIES RUN ISSUE 2: there was a string being passed to selfies_to_encoding that was not in vocab_stoi
+        # so I wrapped this in a try/except block, making it return (essentially) an empty Variable in the except part
+        try:
+            all_encoded = selfies.selfies_to_encoding(mol, vocab_stoi=self.vocab_stoi, pad_to_len=pad_to_len, enc_type="label")
+            all_encoded = np.array(all_encoded, dtype=float)
+        except:
+            all_encoded = np.array([], dtype=float)
         if all_encoded is not None:
             return Variable(all_encoded)
 
@@ -117,10 +122,17 @@ class MolData(Dataset): ### change to SELFIES
     @classmethod
     def collate_fn(cls, arr):
         """Function to take a list of encoded sequences and turn them into a batch"""
+        # SELFIES RUN ISSUE 3: this function is (I think) called in line 56-57 (with the DataLoader) of transfer_userinpt
+        # I think it was giving a problem when there was an empty seq (which would have been from the adjustment in __getitem__)
+        # so I just added a check for when seq is empty and returned another empty array when seq is empty
         max_length = max([seq.size(0) for seq in arr])
-        collated_arr = Variable(torch.zeros(len(arr), max_length))
-        for i, seq in enumerate(arr):
-            collated_arr[i, :seq.size(0)] = seq
+        if max_length == 0:
+            collated_arr = Variable(torch.zeros(0, 0))
+        else:
+            max_length = max([seq.size(0) for seq in arr]) 
+            collated_arr = Variable(torch.zeros(len(arr), max_length))
+            for i, seq in enumerate(arr):
+                collated_arr[i, :seq.size(0)] = seq
         return collated_arr
 
 
